@@ -41,7 +41,7 @@ message OrderResponse {
   string email = 3;
   string phone = 4;
   string shipping_address = 5;
-  string status = 6; // Created, Paid, Processing, Shipped, Completed, ReturnRequested, Returned, Cancelled
+  string status = 6;
   double total_price = 7;
   string created_at = 8;
   string payment_method = 9;

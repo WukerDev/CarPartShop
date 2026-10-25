@@ -41,7 +41,6 @@ public class OrderGrpcService : OrderService.OrderServiceBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, errors));
         }
 
-        // Extract user from JWT claims if present
         var httpContext = context != null ? context.GetHttpContext() : null;
         var userId = httpContext?.User?.Identity?.Name ??
                      httpContext?.User?.FindFirst("preferred_username")?.Value ??
@@ -67,7 +66,6 @@ public class OrderGrpcService : OrderService.OrderServiceBase
                 throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Niewystarczająca ilość części '{part.Name}' w magazynie (dostępne: {part.StockQuantity})."));
             }
 
-            // Deduct stock
             part.StockQuantity -= itemReq.Quantity;
 
             var itemTotal = part.Price * itemReq.Quantity;
@@ -83,7 +81,6 @@ public class OrderGrpcService : OrderService.OrderServiceBase
                 TotalPrice = itemTotal
             });
 
-            // SignalR broadcast for stock update
             await _hubContext.Clients.All.SendAsync("ReceiveStockUpdate", part.Id, part.StockQuantity);
         }
 
@@ -95,7 +92,7 @@ public class OrderGrpcService : OrderService.OrderServiceBase
             Phone = request.Phone,
             ShippingAddress = request.ShippingAddress,
             PaymentMethod = string.IsNullOrWhiteSpace(request.PaymentMethod) ? "Card" : request.PaymentMethod,
-            Status = "Paid", // Auto-marked as paid for simulated seamless checkout
+            Status = "Paid",
             TotalPrice = totalPrice,
             ReturnStatus = "None",
             CreatedAt = DateTime.UtcNow,
@@ -108,7 +105,6 @@ public class OrderGrpcService : OrderService.OrderServiceBase
         _logger.LogInformation("Utworzono zamówienie #{OrderId} o wartości {Total} PLN dla klienta {Customer}",
             order.Id, order.TotalPrice, order.CustomerName);
 
-        // Notify real-time subscribers via SignalR
         await _hubContext.Clients.All.SendAsync("ReceiveOrderPlaced", order.Id, order.CustomerName, (double)order.TotalPrice);
         await _hubContext.Clients.All.SendAsync("ReceiveOrderStatusChanged", order.Id, order.Status, "Zamówienie zostało pomyślnie złożone i opłacone.");
 
@@ -192,7 +188,6 @@ public class OrderGrpcService : OrderService.OrderServiceBase
         order.ReturnComments = request.Comments;
         order.UpdatedAt = DateTime.UtcNow;
 
-        // Restore stock
         foreach (var item in order.Items)
         {
             var part = await _dbContext.CarParts.FindAsync(item.CarPartId);
@@ -218,7 +213,6 @@ public class OrderGrpcService : OrderService.OrderServiceBase
 
         _logger.LogInformation("Zgłoszono i zaakceptowano zwrot dla zamówienia #{OrderId}. Powód: {Reason}", order.Id, request.Reason);
 
-        // SignalR broadcast
         await _hubContext.Clients.All.SendAsync("ReceiveReturnUpdate", order.Id, "Approved", $"Zwrot zamówienia #{order.Id} został zaakceptowany.");
         await _hubContext.Clients.All.SendAsync("ReceiveOrderStatusChanged", order.Id, "Returned", "Status zamówienia zmieniony na: Zwrócone");
 

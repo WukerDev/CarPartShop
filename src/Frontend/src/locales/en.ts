@@ -31,6 +31,10 @@ export default {
     clientRole: 'Customer',
     orderHistory: 'Order History',
     reportedReturns: 'Reported Returns',
+    seedDatabase: 'Seed Sample Data',
+    seedConfirm: 'Are you sure you want to reset and seed the database with sample data?',
+    seeding: 'Seeding data...',
+    seedSuccess: 'Database successfully seeded with sample data!',
     logout: 'Log out',
     login: 'Log in'
   },
@@ -266,6 +270,8 @@ export default {
     orderCreateError: 'Error during order placement',
     ordersFetchError: 'Failed to fetch order history.',
     returnRequestError: 'Error requesting return.',
-    paymentError: 'Payment error'
+    paymentError: 'Payment error',
+    seedError: 'Error while seeding database',
+    seedStatusError: 'Failed to fetch database status'
   }
 };

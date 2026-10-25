@@ -151,6 +151,12 @@
 
           <v-divider></v-divider>
 
+          <v-list-item prepend-icon="mdi-database-refresh" @click="confirmSeedDialog = true">
+            {{ $t('navbar.seedDatabase') }}
+          </v-list-item>
+
+          <v-divider></v-divider>
+
           <v-list-item
             v-if="authStore.isAuthenticated"
             prepend-icon="mdi-logout"
@@ -171,21 +177,47 @@
         </v-list>
       </v-menu>
     </v-container>
+
+    <v-dialog v-model="confirmSeedDialog" max-width="450">
+      <v-card color="#1F2937" class="rounded-xl border border-grey-darken-3 pa-2">
+        <v-card-title class="d-flex align-center font-weight-bold text-white">
+          <v-icon icon="mdi-database-refresh" color="primary" class="mr-2"></v-icon>
+          {{ $t('navbar.seedDatabase') }}
+        </v-card-title>
+        <v-card-text class="text-grey-lighten-1">
+          {{ $t('navbar.seedConfirm') }}
+        </v-card-text>
+        <v-card-actions class="justify-end">
+          <v-btn variant="text" :disabled="seedingLoading" @click="confirmSeedDialog = false">
+            {{ $t('common.cancel') }}
+          </v-btn>
+          <v-btn color="primary" variant="flat" :loading="seedingLoading" @click="handleSeed">
+            {{ $t('common.confirm') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app-bar>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useCartStore } from '@/stores/cartStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useCatalogStore } from '@/stores/catalogStore';
+import { useOrderStore } from '@/stores/orderStore';
+import { api } from '@/services/api';
 import { setLanguage } from '@/plugins/i18n';
 
 const { locale } = useI18n();
 const cartStore = useCartStore();
 const authStore = useAuthStore();
 const catalogStore = useCatalogStore();
+const orderStore = useOrderStore();
+
+const confirmSeedDialog = ref(false);
+const seedingLoading = ref(false);
 
 const currentLocale = computed(() => locale.value);
 const currentLocaleLabel = computed(() => locale.value.toUpperCase());
@@ -196,6 +228,21 @@ function switchLanguage(lang: 'pl' | 'en') {
 
 function onSearch() {
   catalogStore.fetchParts();
+}
+
+async function handleSeed() {
+  seedingLoading.value = true;
+  try {
+    await api.seedDatabase(true);
+    await catalogStore.fetchCategories();
+    await catalogStore.fetchParts();
+    await orderStore.fetchOrders();
+    confirmSeedDialog.value = false;
+  } catch (err: any) {
+    console.error(err);
+  } finally {
+    seedingLoading.value = false;
+  }
 }
 </script>
 

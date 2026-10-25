@@ -31,6 +31,10 @@ export default {
     clientRole: 'Klient',
     orderHistory: 'Historia zamówień',
     reportedReturns: 'Zgłoszone zwroty',
+    seedDatabase: 'Załaduj dane testowe',
+    seedConfirm: 'Czy na pewno chcesz zresetować i załadować gotowe dane do bazy?',
+    seeding: 'Ładowanie danych...',
+    seedSuccess: 'Baza danych została pomyślnie zasilona gotowymi danymi!',
     logout: 'Wyloguj się',
     login: 'Zaloguj się'
   },
@@ -266,6 +270,8 @@ export default {
     orderCreateError: 'Błąd podczas składania zamówienia',
     ordersFetchError: 'Nie udało się pobrać historii zamówień.',
     returnRequestError: 'Błąd podczas zgłaszania zwrotu.',
-    paymentError: 'Błąd płatności'
+    paymentError: 'Błąd płatności',
+    seedError: 'Błąd podczas zasilania bazy danych',
+    seedStatusError: 'Nie udało się pobrać statusu bazy'
   }
 };

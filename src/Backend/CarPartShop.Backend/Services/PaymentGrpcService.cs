@@ -42,7 +42,6 @@ public class PaymentGrpcService : PaymentService.PaymentServiceBase
             throw new RpcException(new Status(StatusCode.NotFound, $"Zamówienie o ID {request.OrderId} nie istnieje."));
         }
 
-        // Mocked payment processing
         var transactionId = $"TX-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..8].ToUpper()}";
         order.Status = "Paid";
         order.PaymentMethod = request.PaymentMethod;
@@ -53,7 +52,6 @@ public class PaymentGrpcService : PaymentService.PaymentServiceBase
         _logger.LogInformation("Płatność dla zamówienia #{OrderId} powiodła się. Transakcja: {TxId}, Kwota: {Amount} PLN",
             order.Id, transactionId, request.Amount);
 
-        // SignalR broadcast
         await _hubContext.Clients.All.SendAsync("ReceiveOrderStatusChanged", order.Id, "Paid", $"Płatność {request.Amount:F2} PLN została zaksięgowana pomyślnie.");
 
         return new ProcessPaymentResponse

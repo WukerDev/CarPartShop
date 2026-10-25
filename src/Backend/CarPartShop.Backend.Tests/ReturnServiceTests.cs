@@ -93,7 +93,6 @@ public class ReturnServiceTests
         orderInDb!.ReturnStatus.Should().Be("Approved");
         orderInDb.Status.Should().Be("Returned");
 
-        // Stock restored from 10 to 12
         var partInDb = await db.CarParts.FindAsync(1);
         partInDb!.StockQuantity.Should().Be(12);
     }
@@ -103,7 +102,6 @@ public class ReturnServiceTests
     {
         var (db, service) = CreateServiceWithOrder();
 
-        // Mark as returned first
         var order = await db.Orders.FindAsync(1);
         order!.ReturnStatus = "Approved";
         await db.SaveChangesAsync();

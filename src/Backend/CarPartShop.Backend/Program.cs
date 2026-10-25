@@ -9,7 +9,6 @@ using CarPartShop.Backend.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Database Configuration (PostgreSQL with fallback to InMemory for tests/local)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? "Host=postgres;Port=5432;Database=carpartshop;Username=postgres;Password=postgres";
 
@@ -29,7 +28,6 @@ builder.Services.AddDbContext<ShopDbContext>(options =>
     }
 });
 
-// 2. Authentication & Authorization (Keycloak Authority)
 var authority = builder.Configuration["Authentication:Authority"] ?? "http://keycloak:8080/identity/realms/carpartshop";
 var audience = builder.Configuration["Authentication:Audience"] ?? "account";
 var requireHttpsMetadata = builder.Configuration.GetValue<bool>("Authentication:RequireHttpsMetadata", false);
@@ -46,12 +44,11 @@ builder.Services.AddAuthentication(options =>
     options.RequireHttpsMetadata = requireHttpsMetadata;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = false, // Allows tokens issued from internal or gateway hostnames
+        ValidateIssuer = false,
         ValidateAudience = false,
         ValidateLifetime = true
     };
     
-    // Support SignalR JWT token from query string
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
@@ -69,15 +66,12 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// 3. FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderValidator>();
 
-// 4. gRPC and SignalR
 builder.Services.AddGrpc();
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
 
-// 5. CORS policy for Frontend and gRPC-Web
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
@@ -92,9 +86,28 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// 6. Database auto-initialization & seeding
-using (var scope = app.Services.CreateScope())
+if (args.Contains("--seed") || args.Contains("--reseed"))
 {
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ShopDbContext>();
+    try
+    {
+        await DbInitializer.ResetAndSeedAsync(db);
+        Console.WriteLine("Database seeded successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Database seed failed (check if database is reachable): {ex.Message}");
+    }
+
+    if (args.Contains("--exit"))
+    {
+        return;
+    }
+}
+else
+{
+    using var scope = app.Services.CreateScope();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
@@ -108,27 +121,23 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// 7. Middlewares & Routing
 app.UseCors("CorsPolicy");
 app.UseRouting();
 
-// Enable GrpcWeb middleware (must be between UseRouting and UseEndpoints)
 app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map gRPC services with GrpcWeb enabled
 app.MapGrpcService<CatalogGrpcService>().EnableGrpcWeb().RequireCors("CorsPolicy");
 app.MapGrpcService<OrderGrpcService>().EnableGrpcWeb().RequireCors("CorsPolicy");
 app.MapGrpcService<PaymentGrpcService>().EnableGrpcWeb().RequireCors("CorsPolicy");
 
-// Map SignalR Hub
 app.MapHub<ShopHub>("/hubs/shop").RequireCors("CorsPolicy");
 
-// Map REST Controllers
 app.MapControllers().RequireCors("CorsPolicy");
 
 app.MapGet("/", () => "CarPartShop Backend API (.NET 10, gRPC, SignalR, PostgreSQL, Authority) działa poprawnie!");
+app.MapGet("/health", () => Results.Ok(new { status = "Healthy", timestamp = DateTime.UtcNow }));
 
 app.Run();

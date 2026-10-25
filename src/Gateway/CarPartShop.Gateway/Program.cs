@@ -1,6 +1,5 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add YARP Reverse Proxy
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
@@ -20,7 +19,6 @@ var app = builder.Build();
 
 app.UseCors("GatewayCors");
 
-// Redirect / to /portal for clear intuitive navigation
 app.MapGet("/", () => Results.Redirect("/portal"));
 
 app.MapReverseProxy();

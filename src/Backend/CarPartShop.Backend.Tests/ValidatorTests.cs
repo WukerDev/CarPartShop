@@ -67,7 +67,7 @@ public class ValidatorTests
             OrderId = 1,
             Amount = 100,
             PaymentMethod = "Blik",
-            BlikCode = "123" // Invalid, must be 6 digits
+            BlikCode = "123"
         };
 
         var result = validator.Validate(request);

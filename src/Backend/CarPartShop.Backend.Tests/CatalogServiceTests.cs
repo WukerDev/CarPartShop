@@ -40,7 +40,7 @@ public class CatalogServiceTests
                 CategoryId = 1,
                 Manufacturer = "ATE",
                 Price = 300m,
-                StockQuantity = 0, // out of stock
+                StockQuantity = 0,
                 Compatibility = "Audi A4"
             }
         );

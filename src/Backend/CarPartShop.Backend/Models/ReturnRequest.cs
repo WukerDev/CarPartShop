@@ -7,7 +7,7 @@ public class ReturnRequest
     public Order? Order { get; set; }
     public string Reason { get; set; } = string.Empty;
     public string Comments { get; set; } = string.Empty;
-    public string Status { get; set; } = "Pending"; // Pending, Approved, Completed, Rejected
+    public string Status { get; set; } = "Pending";
     public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ResolvedAt { get; set; }
 }

@@ -108,6 +108,39 @@ class ApiService {
     }
     return await res.json();
   }
+
+  async seedDatabase(reset = true): Promise<{
+    success: boolean;
+    message: string;
+    categoriesCount: number;
+    partsCount: number;
+    ordersCount: number;
+    returnsCount: number;
+  }> {
+    const res = await fetch(`${this.getBaseUrl()}/api/seed?reset=${reset}`, {
+      method: 'POST',
+      headers: this.getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: i18n.global.t('errors.seedError') }));
+      throw new Error(err.message || i18n.global.t('errors.seedError'));
+    }
+    return await res.json();
+  }
+
+  async getSeedStatus(): Promise<{
+    isSeeded: boolean;
+    categoriesCount: number;
+    partsCount: number;
+    ordersCount: number;
+    returnsCount: number;
+  }> {
+    const res = await fetch(`${this.getBaseUrl()}/api/seed/status`, {
+      headers: this.getHeaders()
+    });
+    if (!res.ok) throw new Error(i18n.global.t('errors.seedStatusError'));
+    return await res.json();
+  }
 }
 
 export const api = new ApiService();

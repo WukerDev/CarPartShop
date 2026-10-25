@@ -8,10 +8,10 @@ public class Order
     public string Email { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public string ShippingAddress { get; set; } = string.Empty;
-    public string Status { get; set; } = "Created"; // Created, Paid, Processing, Shipped, Completed, ReturnRequested, Returned, Cancelled
+    public string Status { get; set; } = "Created";
     public decimal TotalPrice { get; set; }
     public string PaymentMethod { get; set; } = "Card";
-    public string ReturnStatus { get; set; } = "None"; // None, Pending, Approved, Rejected
+    public string ReturnStatus { get; set; } = "None";
     public string? ReturnReason { get; set; }
     public string? ReturnComments { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

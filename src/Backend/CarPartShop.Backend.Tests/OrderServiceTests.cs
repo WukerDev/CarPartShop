@@ -70,11 +70,11 @@ public class OrderServiceTests
         var response = await service.CreateOrder(request, null!);
 
         response.Should().NotBeNull();
-        response.TotalPrice.Should().Be(100); // 2 * 50
+        response.TotalPrice.Should().Be(100);
         response.Status.Should().Be("Paid");
 
         var partInDb = await db.CarParts.FindAsync(1);
-        partInDb!.StockQuantity.Should().Be(3); // 5 - 2 = 3
+        partInDb!.StockQuantity.Should().Be(3);
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public class OrderServiceTests
             Phone = "+48 123 456 789",
             ShippingAddress = "ul. Morska 15, Gdynia"
         };
-        request.Items.Add(new OrderItemInput { PartId = 1, Quantity = 10 }); // Stock is 5
+        request.Items.Add(new OrderItemInput { PartId = 1, Quantity = 10 });
 
         Func<Task> act = async () => await service.CreateOrder(request, null!);
 
