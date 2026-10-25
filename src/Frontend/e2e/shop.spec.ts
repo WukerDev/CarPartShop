@@ -31,7 +31,7 @@ test.describe('AutoParts Pro E2E Tests', () => {
               stockQuantity: 10,
               description: 'Wysokowydajne tarcze hamulcowe.',
               compatibility: 'VW Golf VII, Audi A3 8V',
-              imageUrl: 'https://images.unsplash.com/photo-1600705722908-bab1e61c0b4d?w=600',
+              imageUrl: '/images/parts/BRE-09.9772.11.jpg',
               rating: 4.9
             },
             {
@@ -45,7 +45,7 @@ test.describe('AutoParts Pro E2E Tests', () => {
               stockQuantity: 5,
               description: 'Gazowy amortyzator jednorurowy.',
               compatibility: 'Audi A4 B8',
-              imageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600',
+              imageUrl: '/images/parts/BIL-22-131607.jpg',
               rating: 4.8
             }
           ]

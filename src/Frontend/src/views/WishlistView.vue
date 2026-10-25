@@ -39,7 +39,7 @@
       >
         <div>
           <div class="position-relative mb-3 image-box rounded-xl overflow-hidden cursor-pointer" @click="openDetails(part)">
-            <v-img :src="part.imageUrl" aspect-ratio="1" cover class="w-100"></v-img>
+            <v-img :src="part.imageUrl" aspect-ratio="1" contain class="w-100 h-100 pa-2 bg-white"></v-img>
             <v-chip size="x-small" color="primary" variant="flat" class="position-absolute top-0 left-0 ma-2 font-weight-bold">
               {{ part.manufacturer }}
             </v-chip>

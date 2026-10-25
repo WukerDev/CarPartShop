@@ -26,8 +26,8 @@
             <v-img
               :src="part.imageUrl"
               aspect-ratio="1"
-              cover
-              class="rounded-lg border w-100"
+              contain
+              class="rounded-lg border w-100 bg-white pa-4"
               style="aspect-ratio: 1 / 1;"
             ></v-img>
           </v-col>

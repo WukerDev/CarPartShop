@@ -69,6 +69,65 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""DiscountCode"" character varyi
 ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""DiscountAmount"" numeric(18,2) DEFAULT 0 NOT NULL;
 ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character varying(100);
 ");
+
+            var imageMap = new Dictionary<string, string>
+            {
+                ["BRE-09.9772.11"] = "/images/parts/BRE-09.9772.11.jpg",
+                ["ATE-13.0470-7242.2"] = "/images/parts/ATE-13.0470-7242.2.jpg",
+                ["TRW-BHN1161E"] = "/images/parts/TRW-BHN1161E.jpg",
+                ["ZIM-600.3243.52"] = "/images/parts/ZIM-600.3243.52.jpg",
+                ["BRE-B4-RED"] = "/images/parts/BRE-B4-RED.jpg",
+                ["BIL-22-131607"] = "/images/parts/BIL-22-131607.jpg",
+                ["LEM-35537-01"] = "/images/parts/LEM-35537-01.jpg",
+                ["EIB-E10-20-031-01-22"] = "/images/parts/EIB-E10-20-031-01-22.jpg",
+                ["KW-10210040"] = "/images/parts/KW-10210040.jpg",
+                ["SKF-VKBA6799"] = "/images/parts/SKF-VKBA6799.jpg",
+                ["MAN-HU719/7x"] = "/images/parts/MAN-HU719_7x.jpg",
+                ["KNE-LAK423"] = "/images/parts/KNE-LAK423.jpg",
+                ["CAS-EDGE-5W30-5L"] = "/images/parts/CAS-EDGE-5W30-5L.jpg",
+                ["KN-33-3005"] = "/images/parts/KN-33-3005.jpg",
+                ["BOS-0450906500"] = "/images/parts/BOS-0450906500.jpg",
+                ["GAT-KP15678XS"] = "/images/parts/GAT-KP15678XS.jpg",
+                ["INA-559015410"] = "/images/parts/INA-559015410.jpg",
+                ["GAR-GTD1752VRK"] = "/images/parts/GAR-GTD1752VRK.jpg",
+                ["REI-61-37540-00"] = "/images/parts/REI-61-37540-00.jpg",
+                ["MAN-H-144-20"] = "/images/parts/MAN-H-144-20.jpg",
+                ["NGK-ILZKR7B-11"] = "/images/parts/NGK-ILZKR7B-11.jpg",
+                ["BOS-0986221057"] = "/images/parts/BOS-0986221057.jpg",
+                ["VAR-570901076"] = "/images/parts/VAR-570901076.jpg",
+                ["VAL-439551"] = "/images/parts/VAL-439551.jpg",
+                ["MAG-80124"] = "/images/parts/MAG-80124.jpg",
+                ["OSR-64210NB200-HCB"] = "/images/parts/OSR-64210NB200-HCB.jpg",
+                ["HEL-1EX011057"] = "/images/parts/HEL-1EX011057.jpg",
+                ["VAL-044872"] = "/images/parts/VAL-044872.jpg",
+                ["MAG-LL-G20"] = "/images/parts/MAG-LL-G20.jpg",
+                ["OSR-66340CBB-HCB"] = "/images/parts/OSR-66340CBB-HCB.jpg",
+                ["REM-045014-0000"] = "/images/parts/REM-045014-0000.jpg",
+                ["MAG-59956"] = "/images/parts/MAG-59956.jpg",
+                ["FIS-050-200"] = "/images/parts/FIS-050-200.jpg",
+                ["AKR-S-VW/T/1"] = "/images/parts/AKR-S-VW_T_1.jpg",
+                ["MIL-SSXVW345"] = "/images/parts/MIL-SSXVW345.jpg",
+                ["NIS-65281A"] = "/images/parts/NIS-65281A.jpg",
+                ["WAH-411287D"] = "/images/parts/WAH-411287D.jpg",
+                ["DEN-DCP02008"] = "/images/parts/DEN-DCP02008.jpg",
+                ["WAG-200001048"] = "/images/parts/WAG-200001048.jpg",
+                ["VAL-698812"] = "/images/parts/VAL-698812.jpg"
+            };
+
+            var existingParts = await context.CarParts.ToListAsync();
+            var hasChanges = false;
+            foreach (var part in existingParts)
+            {
+                if (imageMap.TryGetValue(part.PartNumber, out var newImg) && part.ImageUrl != newImg)
+                {
+                    part.ImageUrl = newImg;
+                    hasChanges = true;
+                }
+            }
+            if (hasChanges)
+            {
+                await context.SaveChangesAsync();
+            }
         }
     }
 
@@ -171,7 +230,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 18,
                 Description = "Wysokowydajne tarcze hamulcowe z powłoką antykorozyjną UV. Zapewniają doskonałą drogę hamowania w każdych warunkach pogodowych.",
                 Compatibility = "VW Golf VII, Audi A3 8V, Skoda Octavia III, Seat Leon 5F",
-                ImageUrl = "https://images.unsplash.com/photo-1600790142055-619df03207e6?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/BRE-09.9772.11.jpg",
                 Rating = 4.9
             },
             new CarPart
@@ -184,7 +243,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 25,
                 Description = "Klocki ceramiczne o obniżonym pyleniu, czyste felgi i cicha praca bez pisków.",
                 Compatibility = "BMW Seria 3 F30 / F31, BMW Seria 4 F32, BMW Seria 1 F20",
-                ImageUrl = "https://images.unsplash.com/photo-1761040100230-8c8e6fc64638?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/ATE-13.0470-7242.2.jpg",
                 Rating = 4.8
             },
             new CarPart
@@ -197,7 +256,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 8,
                 Description = "Kompletny zacisk hamulcowy ze zintegrowanym silniczkiem elektrycznego hamulca ręcznego EPB.",
                 Compatibility = "VW Passat B8, Audi A4 B9, VW Tiguan II",
-                ImageUrl = "https://images.unsplash.com/photo-1783427401907-9a4feb7544d3?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/TRW-BHN1161E.jpg",
                 Rating = 4.7
             },
             new CarPart
@@ -210,7 +269,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 12,
                 Description = "Wentylowane i perforowane sportowe tarcze hamulcowe z powłoką antykorozyjną Coat Z.",
                 Compatibility = "VW Golf GTI MK7, Audi S3 8V, Seat Leon Cupra",
-                ImageUrl = "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/ZIM-600.3243.52.jpg",
                 Rating = 4.9
             },
             new CarPart
@@ -223,7 +282,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 5,
                 Description = "Monoblokowy zacisk 4-tłoczkowy z kutego aluminium. Równomierny docisk i odporność termiczna.",
                 Compatibility = "BMW Seria 3 E90 / E92 / F30, M135i, M235i",
-                ImageUrl = "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/BRE-B4-RED.jpg",
                 Rating = 5.0
             },
 
@@ -237,7 +296,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 14,
                 Description = "Gazowy amortyzator jednorurowy. Perfekcyjna stabilność, komfort jazdy i długa żywotność zgodna z parametrami fabrycznymi.",
                 Compatibility = "Audi A4 B8, Audi A5 8T, Audi Q5 8R",
-                ImageUrl = "https://images.unsplash.com/photo-1760836395763-25ea44ae8145?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/BIL-22-131607.jpg",
                 Rating = 4.9
             },
             new CarPart
@@ -250,7 +309,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 6,
                 Description = "Komplet 8 wzmacnianych wahaczy wraz ze sworzniami i tulejami gumowo-metalowymi klasy premium OEM.",
                 Compatibility = "Audi A6 C7, Audi A7 4G, Porsche Macan",
-                ImageUrl = "https://images.unsplash.com/photo-1760836395716-7dd00b71311a?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/LEM-35537-01.jpg",
                 Rating = 5.0
             },
             new CarPart
@@ -263,7 +322,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 10,
                 Description = "Sportowe progresywne sprężyny obniżające środek ciężkości o 30mm. Zwiększona przyczepność i doskonała optyka.",
                 Compatibility = "BMW Seria 3 E90 / E91 / E92, 320d / 330d / 325i",
-                ImageUrl = "https://images.unsplash.com/photo-1760836395865-0c20fff2aefd?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/EIB-E10-20-031-01-22.jpg",
                 Rating = 4.8
             },
             new CarPart
@@ -276,7 +335,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 4,
                 Description = "Gwintowane sportowe kolumny ze stali nierdzewnej inox-line. Precyzyjna regulacja wysokości i optymalne tłumienie.",
                 Compatibility = "VW Golf VII, Golf VIII, Audi A3 8V",
-                ImageUrl = "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/KW-10210040.jpg",
                 Rating = 5.0
             },
             new CarPart
@@ -289,7 +348,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 20,
                 Description = "Kompletny moduł piasty koła z precyzyjnym łożyskiem dwurzędowym oraz zintegrowanym pierścieniem ABS.",
                 Compatibility = "Ford Mondeo MK4, Ford Focus MK3, Volvo V60",
-                ImageUrl = "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/SKF-VKBA6799.jpg",
                 Rating = 4.8
             },
 
@@ -303,7 +362,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 45,
                 Description = "Wysokiej dokładności wkład filtrujący z uszczelkami. Odporny na agresywne oleje syntetyczne i wysokie ciśnienia.",
                 Compatibility = "VAG 1.9 TDI, 2.0 TDI (CR & PD), Audi, VW, Skoda, Seat",
-                ImageUrl = "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/MAN-HU719_7x.jpg",
                 Rating = 4.9
             },
             new CarPart
@@ -316,7 +375,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 32,
                 Description = "Wielowarstwowy filtr z cząstkami polifenolu neutralizującymi pyłki, smog, bakterie i nieprzyjemne zapachy.",
                 Compatibility = "Toyota Corolla, Toyota Yaris, Toyota Auris, Toyota RAV4 III",
-                ImageUrl = "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/KNE-LAK423.jpg",
                 Rating = 4.7
             },
             new CarPart
@@ -329,7 +388,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 28,
                 Description = "Olej silnikowy z technologią Fluid TITANIUM modyfikujący swoją strukturę pod obciążeniem. Norma VW 504.00/507.00, MB 229.51, BMW LL-04.",
                 Compatibility = "Uniwersalny do silników Benzynowych oraz Diesla z DPF",
-                ImageUrl = "https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/CAS-EDGE-5W30-5L.jpg",
                 Rating = 4.8
             },
             new CarPart
@@ -342,7 +401,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 16,
                 Description = "Wielowarstwowa nasączana gaza bawełniana. O 50% większy przepływ powietrza, zmywalny i wielokrotnego użytku.",
                 Compatibility = "VW Golf VII 2.0 TSI, Audi S3 8V, Cupra Formentor",
-                ImageUrl = "https://images.unsplash.com/photo-1517524206127-48bbd363f3d7?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/KN-33-3005.jpg",
                 Rating = 4.9
             },
             new CarPart
@@ -355,7 +414,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 24,
                 Description = "Zaawansowany filtr paliwa do układów wtryskowych wysokiego ciśnienia. Skuteczna separacja wody do 99%.",
                 Compatibility = "BMW Seria 5 F10 / F11 520d / 530d, Seria 3 F30 320d",
-                ImageUrl = "https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/BOS-0450906500.jpg",
                 Rating = 4.8
             },
 
@@ -369,7 +428,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 12,
                 Description = "Wzmocniony pasek rozrządu, rolka napinająca, rolki prowadzące oraz pompa cieczy chłodzącej z metalowym wirnikiem.",
                 Compatibility = "Ford Focus MK3 1.6 TDCi, Ford Mondeo MK4 2.0 TDCi, Volvo V40 D2",
-                ImageUrl = "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/GAT-KP15678XS.jpg",
                 Rating = 4.9
             },
             new CarPart
@@ -382,7 +441,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 7,
                 Description = "Kompletny zestaw bezluzowego łańcucha rozrządu ze ślizgami i hydraulicznym napinaczem nowej generacji.",
                 Compatibility = "Mercedes-Benz C-Klasa W204 C200/C220 CDI, E-Klasa W212 OM651",
-                ImageUrl = "https://images.unsplash.com/photo-1613206485381-b028e578e791?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/INA-559015410.jpg",
                 Rating = 4.6
             },
             new CarPart
@@ -395,7 +454,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 4,
                 Description = "Oryginalna turbosprężarka ze sterownikiem elektronicznym i wirnikiem kęsowym CNC. Błyskawiczna reakcja na gaz.",
                 Compatibility = "BMW 2.0d N47 / B47, 118d, 120d, 318d, 320d, 520d",
-                ImageUrl = "https://images.unsplash.com/photo-1778757949517-e2d936d0f214?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/GAR-GTD1752VRK.jpg",
                 Rating = 5.0
             },
             new CarPart
@@ -408,7 +467,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 19,
                 Description = "Zaawansowana uszczelka stalowa wielowarstwowa (Multi-Layer Steel) do jednostek doładowanych.",
                 Compatibility = "Opel Astra J 1.4 Turbo, Insignia A 1.4, Chevrolet Cruze",
-                ImageUrl = "https://images.unsplash.com/photo-1561237743-3aa447c271d1?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/REI-61-37540-00.jpg",
                 Rating = 4.7
             },
             new CarPart
@@ -421,7 +480,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 6,
                 Description = "Wytrzymałe korbowody z kutej stali 4340 z kompletem oryginalnych śrub ARP 2000. Do projektów o mocy powyżej 450 KM.",
                 Compatibility = "VW Golf GTI MK7 2.0 TSI, Audi S3 8V, Leon Cupra",
-                ImageUrl = "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/MAN-H-144-20.jpg",
                 Rating = 5.0
             },
 
@@ -435,7 +494,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 30,
                 Description = "Laserowo spawana irydowa elektroda centralna. Ekstremalnie równa iskra, redukcja spalania i długa trwałość do 100 tys. km.",
                 Compatibility = "Honda Civic VIII / IX 1.8 i-VTEC, Accord VIII 2.0 / 2.4",
-                ImageUrl = "https://images.unsplash.com/photo-1782885044133-27c4df887d96?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/NGK-ILZKR7B-11.jpg",
                 Rating = 4.9
             },
             new CarPart
@@ -448,7 +507,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 22,
                 Description = "Wzmocniona cewka zapłonowa zapewniająca mocniejszy przeskok iskry przy wysokich obrotach i po modyfikacji mocy.",
                 Compatibility = "VAG 2.0 TFSI / TSI (Golf GTI, Audi S3, Leon Cupra)",
-                ImageUrl = "https://images.unsplash.com/photo-1745242666912-d52c3ca9a2b8?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/BOS-0986221057.jpg",
                 Rating = 4.8
             },
             new CarPart
@@ -461,7 +520,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 15,
                 Description = "Bezobsługowy akumulator w technologii Absorbent Glass Mat do nowoczesnych aut z rekuperacją energii hamowania.",
                 Compatibility = "BMW, Mercedes, Audi, Volvo z systemem Start-Stop",
-                ImageUrl = "https://images.unsplash.com/photo-1677230017860-a8cc67785f0a?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/VAR-570901076.jpg",
                 Rating = 4.9
             },
             new CarPart
@@ -474,7 +533,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 8,
                 Description = "Wysokowydajny alternator z technologią chłodzenia wewnętrznego i sprzęgłem jednokierunkowym OAP.",
                 Compatibility = "Audi A4 B8 2.0 TDI, Audi A6 C7 2.0 TDI, VW Passat B8",
-                ImageUrl = "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/VAL-439551.jpg",
                 Rating = 4.8
             },
             new CarPart
@@ -487,7 +546,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 14,
                 Description = "Sportowe silikonowe przewody zapłonowe z rdzeniem ferrytowym eliminującym zakłócenia RFI/EMI.",
                 Compatibility = "BMW Seria 3 E36 / E46 318i / 320i, VW Golf IV 1.6 / 2.0",
-                ImageUrl = "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/MAG-80124.jpg",
                 Rating = 4.7
             },
 
@@ -501,7 +560,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 40,
                 Description = "Najjaśniejsze żarówki halogenowe Osram z homologacją drogową ECE. Snop światła dłuższy nawet o 150 metrów.",
                 Compatibility = "Uniwersalne gniazdo H7 (PX26d) - 12V 55W",
-                ImageUrl = "https://images.unsplash.com/photo-1567152142146-9bb2f1982d41?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/OSR-64210NB200-HCB.jpg",
                 Rating = 4.7
             },
             new CarPart
@@ -514,7 +573,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 5,
                 Description = "Kompletny reflektor matrycowy LED ze zintegrowanym modułem dynamicznego kierunkowskazu i poziomowania.",
                 Compatibility = "Audi A4 B9 2015-2019, S4 B9",
-                ImageUrl = "https://images.unsplash.com/photo-1745242669115-dbf058eadbb4?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/HEL-1EX011057.jpg",
                 Rating = 4.9
             },
             new CarPart
@@ -527,7 +586,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 9,
                 Description = "Oryginalny moduł tylnej lampy LED o doskonałej szczelności i precyzyjnym dopasowaniu.",
                 Compatibility = "Audi A6 C7 Avant (kombi) 2011-2014",
-                ImageUrl = "https://images.unsplash.com/photo-1684734123081-6466bf4e6e56?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/VAL-044872.jpg",
                 Rating = 4.8
             },
             new CarPart
@@ -540,7 +599,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 3,
                 Description = "Oryginalne reflektory Laser LED o zasięgu do 600m z przyciemnianym wykończeniem Shadow Line.",
                 Compatibility = "BMW Seria 3 G20 / G21 2019-2023, M340i",
-                ImageUrl = "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/MAG-LL-G20.jpg",
                 Rating = 5.0
             },
             new CarPart
@@ -553,7 +612,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 18,
                 Description = "Zestaw dwóch palników ksenonowych o hiper-niebieskiej barwie 7000K i zwiększonym strumieniu świetlnym.",
                 Compatibility = "Audi A4 B8, Audi Q5 8R, VW Passat B7 / B8, Ford Mondeo MK5",
-                ImageUrl = "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/OSR-66340CBB-HCB.jpg",
                 Rating = 4.9
             },
 
@@ -567,7 +626,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 5,
                 Description = "Sportowy tłumik przelotowy wykonany z kwasoodpornej stali nierdzewnej. Rasowe brzmienie i obniżone opory spalin.",
                 Compatibility = "VW Golf GTI MK7 / MK7.5 2.0 TSI",
-                ImageUrl = "https://images.unsplash.com/photo-1735231831018-8a41b99e8d7a?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/REM-045014-0000.jpg",
                 Rating = 5.0
             },
             new CarPart
@@ -580,7 +639,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 11,
                 Description = "Metalowy monolit o przepustowości 200 CPSI. Wytrzymuje temperatury spalin do 1100°C w autach po tuningu.",
                 Compatibility = "Uniwersalny wydech o średnicy 63.5mm (2.5 cala)",
-                ImageUrl = "https://images.unsplash.com/photo-1673153069612-3c4b591860ce?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/MAG-59956.jpg",
                 Rating = 4.8
             },
             new CarPart
@@ -593,7 +652,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 50,
                 Description = "Tłumik drgań wydechu z wewnętrznym peszlem ze stali kwasoodpornej. Eliminuje rezonans i wibracje silnika.",
                 Compatibility = "Uniwersalny spawany (średnica montażowa 50mm, długość 200mm)",
-                ImageUrl = "https://images.unsplash.com/photo-1761040100208-07f603acc83f?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/FIS-050-200.jpg",
                 Rating = 4.6
             },
             new CarPart
@@ -606,7 +665,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 2,
                 Description = "Kompletny układ z ultralekkiego tytanu z aktywnymi przepustnicami wydechu sterowanymi z kokpitu.",
                 Compatibility = "VW Golf VII R 2.0 TSI, Audi S3 8V 2.0 TFSI",
-                ImageUrl = "https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/AKR-S-VW_T_1.jpg",
                 Rating = 5.0
             },
             new CarPart
@@ -619,7 +678,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 7,
                 Description = "Rura początkowa 76mm eliminująca restrykcje fabrycznego katalizatora. Obniża temperaturę pracy turbosprężarki.",
                 Compatibility = "Audi A3 8V 2.0 TFSI, VW Golf VII GTI / R, Seat Leon Cupra",
-                ImageUrl = "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/MIL-SSXVW345.jpg",
                 Rating = 4.9
             },
 
@@ -633,7 +692,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 11,
                 Description = "Aluminiowy rdzeń chłodnicy o podwyższonej wydajności odprowadzania ciepła z fabrycznymi mocowaniami.",
                 Compatibility = "BMW Seria 5 F10 / F11 520d, 525d, 530d",
-                ImageUrl = "https://images.unsplash.com/photo-1778183228710-75fce1e9fb06?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/NIS-65281A.jpg",
                 Rating = 4.9
             },
             new CarPart
@@ -646,7 +705,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 26,
                 Description = "Zintegrowany termostat z czujnikiem temperatury i kompletem uszczelek. Szybkie dogrzewanie silnika w zimie.",
                 Compatibility = "Ford Mondeo MK4, S-Max 2.0 TDCi, Peugeot 508 2.0 HDi",
-                ImageUrl = "https://images.unsplash.com/photo-1562911791-c7a97b729ec5?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/WAH-411287D.jpg",
                 Rating = 4.8
             },
             new CarPart
@@ -659,7 +718,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 6,
                 Description = "Fabrycznie nowa sprężarka klimatyzacji ze sprzęgłem elektromagnetycznym i fabrycznym olejem PAG46.",
                 Compatibility = "Toyota RAV4 III, Avensis T27 2.0 D-4D",
-                ImageUrl = "https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/DEN-DCP02008.jpg",
                 Rating = 4.9
             },
             new CarPart
@@ -672,7 +731,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 4,
                 Description = "Wydajna chłodnica powietrza doładowującego o 90% większej powierzchni czołowej i 140% większej pojemności rdzenia.",
                 Compatibility = "VAG 2.0 TSI EA888.3 (Golf GTI/R, Audi S3, Cupra 300)",
-                ImageUrl = "https://images.unsplash.com/photo-1530906358829-e84b2769270f?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/WAG-200001048.jpg",
                 Rating = 5.0
             },
             new CarPart
@@ -685,7 +744,7 @@ ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""InvoiceNumber"" character vary
                 StockQuantity = 9,
                 Description = "Kompletny zespół podwójnego wentylatora chłodnicy i klimatyzacji z obudową oraz wbudowanym sterownikiem.",
                 Compatibility = "VW Passat B6 / B7 / B8, Tiguan II, Touran II, Golf VII",
-                ImageUrl = "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=600&h=600&auto=format&fit=crop&q=80",
+                ImageUrl = "/images/parts/VAL-698812.jpg",
                 Rating = 4.8
             }
         };

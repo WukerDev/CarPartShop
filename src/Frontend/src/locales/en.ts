@@ -28,8 +28,6 @@ export default {
     userProfile: 'My Profile & Shipping Data',
     searchPlaceholder: 'Search by name, OEM number (e.g. BRE, BOS), brand...',
     searchButton: 'Search',
-    liveHubTooltip: 'Real-time SignalR connection active',
-    liveHub: 'Live Hub',
     adminRole: 'Store Administrator',
     clientRole: 'Customer',
     orderHistory: 'Order History',

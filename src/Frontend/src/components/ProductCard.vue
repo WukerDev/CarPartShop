@@ -9,12 +9,12 @@
     @click="$emit('view-details', part)"
     @keydown.enter="$emit('view-details', part)"
   >
-    <div class="product-image-container position-relative overflow-hidden w-100">
+    <div class="product-image-container position-relative overflow-hidden w-100 d-flex align-center justify-center">
       <v-img
         :src="part.imageUrl"
         aspect-ratio="1"
-        cover
-        class="align-end w-100 h-100"
+        contain
+        class="align-center w-100 h-100 pa-3"
       >
         <template #placeholder>
           <div class="d-flex align-center justify-center fill-height">
@@ -197,7 +197,7 @@ function addToCart() {
 
 .product-image-container {
   aspect-ratio: 1 / 1;
-  background-color: #061012;
+  background-color: #ffffff;
 }
 
 .compatibility-box {

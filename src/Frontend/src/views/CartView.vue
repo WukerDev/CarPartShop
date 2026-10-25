@@ -45,8 +45,8 @@
                   :src="item.part.imageUrl"
                   width="70"
                   height="70"
-                  cover
-                  class="rounded-lg mr-3 flex-shrink-0 border"
+                  contain
+                  class="rounded-lg mr-3 flex-shrink-0 border bg-white pa-1"
                 ></v-img>
                 <div>
                   <div class="text-caption text-secondary font-weight-bold">

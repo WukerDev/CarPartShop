@@ -84,21 +84,6 @@
         </v-text-field>
       </div>
 
-      <v-tooltip location="bottom" :text="$t('navbar.liveHubTooltip')">
-        <template #activator="{ props }">
-          <v-chip
-            v-bind="props"
-            size="small"
-            color="success"
-            variant="tonal"
-            class="mr-3 d-none d-lg-flex"
-            prepend-icon="mdi-circle-medium"
-          >
-            {{ $t('navbar.liveHub') }}
-          </v-chip>
-        </template>
-      </v-tooltip>
-
       <v-menu location="bottom end">
         <template #activator="{ props }">
           <v-btn

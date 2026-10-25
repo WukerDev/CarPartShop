@@ -203,8 +203,8 @@
                 class="d-flex justify-space-between align-center py-2 border-b"
               >
                 <div class="d-flex align-center">
-                  <v-avatar size="36" rounded="lg" class="mr-2 border">
-                    <v-img :src="item.part.imageUrl" cover></v-img>
+                  <v-avatar size="36" rounded="lg" class="mr-2 border bg-white pa-1">
+                    <v-img :src="item.part.imageUrl" contain></v-img>
                   </v-avatar>
                   <div>
                     <div class="text-caption font-weight-bold text-white text-truncate" style="max-width: 170px;">

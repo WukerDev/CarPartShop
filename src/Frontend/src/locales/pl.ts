@@ -28,8 +28,6 @@ export default {
     userProfile: 'Mój profil i dane dostawy',
     searchPlaceholder: 'Szukaj po nazwie, nr OEM (np. BRE, BOS), marce...',
     searchButton: 'Szukaj',
-    liveHubTooltip: 'Połączenie SignalR w czasie rzeczywistym aktywne',
-    liveHub: 'Live Hub',
     adminRole: 'Administrator sklepu',
     clientRole: 'Klient',
     orderHistory: 'Historia zamówień',
