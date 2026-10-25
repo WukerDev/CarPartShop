@@ -26,8 +26,8 @@ onMounted(() => {
 <style>
 body {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
-  background-color: #0B0F19;
-  color: #F3F4F6;
+  background-color: #071314;
+  color: #F0FDFA;
 }
 
 ::-webkit-scrollbar {
@@ -35,13 +35,13 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0B0F19;
+  background: #071314;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1F2937;
+  background: #14272A;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: #14B8A6;
 }
 </style>

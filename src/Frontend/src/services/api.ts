@@ -31,6 +31,9 @@ class ApiService {
     minPrice?: number;
     maxPrice?: number;
     inStockOnly?: boolean;
+    carMake?: string;
+    carModel?: string;
+    carYear?: number;
   }): Promise<{ parts: CarPart[]; totalCount: number }> {
     const query = new URLSearchParams();
     if (params?.categoryId) query.append('categoryId', params.categoryId.toString());
@@ -38,11 +41,40 @@ class ApiService {
     if (params?.minPrice) query.append('minPrice', params.minPrice.toString());
     if (params?.maxPrice) query.append('maxPrice', params.maxPrice.toString());
     if (params?.inStockOnly) query.append('inStockOnly', 'true');
+    if (params?.carMake) query.append('carMake', params.carMake);
+    if (params?.carModel) query.append('carModel', params.carModel);
+    if (params?.carYear) query.append('carYear', params.carYear.toString());
 
     const res = await fetch(`${this.getBaseUrl()}/api/catalog/parts?${query.toString()}`, {
       headers: this.getHeaders()
     });
     if (!res.ok) throw new Error(i18n.global.t('errors.catalogLoadError'));
+    return await res.json();
+  }
+
+  async getVehicleMakes(): Promise<string[]> {
+    const res = await fetch(`${this.getBaseUrl()}/api/vehicle/makes`, {
+      headers: this.getHeaders()
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  }
+
+  async getVehicleModels(make: string): Promise<string[]> {
+    const res = await fetch(`${this.getBaseUrl()}/api/vehicle/models?make=${encodeURIComponent(make)}`, {
+      headers: this.getHeaders()
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  }
+
+  async getVehicleYears(make: string, model?: string): Promise<number[]> {
+    let url = `${this.getBaseUrl()}/api/vehicle/years?make=${encodeURIComponent(make)}`;
+    if (model) url += `&model=${encodeURIComponent(model)}`;
+    const res = await fetch(url, {
+      headers: this.getHeaders()
+    });
+    if (!res.ok) return [];
     return await res.json();
   }
 

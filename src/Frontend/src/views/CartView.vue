@@ -21,7 +21,7 @@
 
     <v-row v-if="cartStore.itemCount > 0">
       <v-col cols="12" md="8">
-        <v-card color="#151D2C" class="rounded-2xl pa-4 mb-4" border>
+        <v-card color="surface" class="rounded-2xl pa-4 mb-4" border>
           <div class="mb-4 pa-3 rounded-xl bg-surface-variant">
             <div class="d-flex justify-space-between align-center text-caption mb-1">
               <span class="font-weight-bold text-white">
@@ -102,7 +102,7 @@
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-card color="#151D2C" class="rounded-2xl pa-6" border>
+        <v-card color="surface" class="rounded-2xl pa-6" border>
           <h2 class="text-h6 font-weight-bold text-white mb-4">{{ $t('cart.summaryTitle') }}</h2>
 
           <div class="d-flex justify-space-between text-body-2 text-grey mb-2">
@@ -147,7 +147,7 @@
 
     <v-sheet
       v-else
-      color="#151D2C"
+      color="surface"
       class="pa-12 text-center rounded-2xl border my-8"
     >
       <v-icon icon="mdi-cart-off" size="64" color="grey" class="mb-3"></v-icon>

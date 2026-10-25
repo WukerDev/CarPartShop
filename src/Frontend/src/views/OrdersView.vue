@@ -34,7 +34,7 @@
       <v-card
         v-for="order in orderStore.orders"
         :key="order.id"
-        color="#151D2C"
+        color="surface"
         class="rounded-2xl pa-5 mb-5 border"
       >
         <div class="d-flex flex-column flex-sm-row justify-space-between align-start align-sm-center pb-3 border-b mb-3">
@@ -122,7 +122,7 @@
 
     <v-sheet
       v-else
-      color="#151D2C"
+      color="surface"
       class="pa-12 text-center rounded-2xl border my-8"
     >
       <v-icon icon="mdi-package-variant" size="64" color="grey" class="mb-3"></v-icon>
@@ -134,7 +134,7 @@
     </v-sheet>
 
     <v-dialog v-model="returnDialogOpen" max-width="500">
-      <v-card color="#151D2C" class="rounded-xl pa-3" border>
+      <v-card color="surface" class="rounded-xl pa-3" border>
         <v-card-title class="d-flex align-center justify-space-between pt-2 px-3">
           <div class="d-flex align-center">
             <v-icon icon="mdi-keyboard-return" color="warning" class="mr-2"></v-icon>

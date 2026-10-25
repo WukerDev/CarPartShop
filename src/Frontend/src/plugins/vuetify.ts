@@ -8,22 +8,22 @@ export default createVuetify({
   components,
   directives,
   theme: {
-    defaultTheme: 'darkAutoTheme',
+    defaultTheme: 'celadonTheme',
     themes: {
-      darkAutoTheme: {
+      celadonTheme: {
         dark: true,
         colors: {
-          background: '#0B0F19',
-          surface: '#151D2C',
-          'surface-variant': '#1F293D',
-          primary: '#E11D48', 
-          'primary-darken-1': '#BE123C',
-          secondary: '#38BDF8', 
-          accent: '#F59E0B', 
-          success: '#10B981', 
-          warning: '#FBBF24',
+          background: '#071314',
+          surface: '#0E1C1E',
+          'surface-variant': '#14272A',
+          primary: '#14B8A6',
+          'primary-darken-1': '#0D9488',
+          secondary: '#2DD4BF',
+          accent: '#5EEAD4',
+          success: '#10B981',
+          warning: '#F59E0B',
           error: '#EF4444',
-          info: '#3B82F6'
+          info: '#06B6D4'
         }
       }
     }

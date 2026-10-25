@@ -26,7 +26,7 @@ public class DbInitializerTests
         var stats = await DbInitializer.GetStatsAsync(db);
 
         stats.categories.Should().Be(8);
-        stats.parts.Should().Be(24);
+        stats.parts.Should().Be(25);
         stats.orders.Should().Be(4);
         stats.returns.Should().Be(1);
     }
@@ -42,7 +42,7 @@ public class DbInitializerTests
         var stats = await DbInitializer.GetStatsAsync(db);
 
         stats.categories.Should().Be(8);
-        stats.parts.Should().Be(24);
+        stats.parts.Should().Be(25);
         stats.orders.Should().Be(4);
         stats.returns.Should().Be(1);
     }
@@ -58,7 +58,7 @@ public class DbInitializerTests
         var stats = await DbInitializer.GetStatsAsync(db);
 
         stats.categories.Should().Be(8);
-        stats.parts.Should().Be(24);
+        stats.parts.Should().Be(25);
         stats.orders.Should().Be(4);
         stats.returns.Should().Be(1);
     }

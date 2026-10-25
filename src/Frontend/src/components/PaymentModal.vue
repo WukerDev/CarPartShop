@@ -1,6 +1,6 @@
 <template>
   <v-dialog :model-value="modelValue" max-width="500" persistent>
-    <v-card color="#151D2C" class="rounded-xl pa-2" border>
+    <v-card color="surface" class="rounded-xl pa-2" border>
       <v-card-title class="d-flex align-center justify-space-between pt-4 px-4">
         <div class="d-flex align-center">
           <v-icon icon="mdi-shield-check" color="success" size="24" class="mr-2"></v-icon>

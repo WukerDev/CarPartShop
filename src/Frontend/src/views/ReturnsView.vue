@@ -13,7 +13,7 @@
 
     <v-row class="mb-6">
       <v-col cols="12" md="4">
-        <v-card color="#151D2C" class="pa-4 rounded-xl border h-100">
+        <v-card color="surface" class="pa-4 rounded-xl border h-100">
           <div class="d-flex align-center mb-2">
             <v-icon icon="mdi-calendar-check" color="success" size="24" class="mr-2"></v-icon>
             <span class="text-subtitle-2 font-weight-bold text-white">{{ $t('returns.banner1.title') }}</span>
@@ -25,7 +25,7 @@
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-card color="#151D2C" class="pa-4 rounded-xl border h-100">
+        <v-card color="surface" class="pa-4 rounded-xl border h-100">
           <div class="d-flex align-center mb-2">
             <v-icon icon="mdi-cash-refund" color="secondary" size="24" class="mr-2"></v-icon>
             <span class="text-subtitle-2 font-weight-bold text-white">{{ $t('returns.banner2.title') }}</span>
@@ -37,7 +37,7 @@
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-card color="#151D2C" class="pa-4 rounded-xl border h-100">
+        <v-card color="surface" class="pa-4 rounded-xl border h-100">
           <div class="d-flex align-center mb-2">
             <v-icon icon="mdi-package-variant-closed-check" color="warning" size="24" class="mr-2"></v-icon>
             <span class="text-subtitle-2 font-weight-bold text-white">{{ $t('returns.banner3.title') }}</span>
@@ -57,7 +57,7 @@
       <v-card
         v-for="order in orderStore.orders"
         :key="order.id"
-        color="#151D2C"
+        color="surface"
         class="rounded-xl pa-4 mb-4 border"
       >
         <div class="d-flex justify-space-between align-center">
@@ -105,7 +105,7 @@
 
     <v-sheet
       v-else
-      color="#151D2C"
+      color="surface"
       class="pa-8 text-center rounded-2xl border"
     >
       <v-icon icon="mdi-information-outline" size="48" color="grey" class="mb-2"></v-icon>

@@ -25,6 +25,7 @@ export default {
     orders: 'Moje Zamówienia',
     returns: 'Zwroty',
     searchPlaceholder: 'Szukaj po nazwie, nr OEM (np. BRE, BOS), marce...',
+    searchButton: 'Szukaj',
     liveHubTooltip: 'Połączenie SignalR w czasie rzeczywistym aktywne',
     liveHub: 'Live Hub',
     adminRole: 'Administrator sklepu',
@@ -57,7 +58,18 @@ export default {
     emptyDesc: 'Spróbuj zmienić parametry wyszukiwania lub zresetować filtry.',
     resetFilters: 'Resetuj filtry',
     fitsTo: 'Pasuje m.in. do:',
-    addToCart: 'Do koszyka'
+    addToCart: 'Do koszyka',
+    searchButton: 'Szukaj',
+    searchHeroPlaceholder: 'Wyszukaj część po nazwie, modelu auta lub numerze OEM...',
+    vehicleSelectorTitle: 'Wyszukaj Części wg Samochodu',
+    vehicleSelectorDesc: 'Wybierz markę, model oraz rocznik pojazdu, aby wyświetlić dedykowane części',
+    selectMake: 'Marka pojazdu',
+    selectModel: 'Model',
+    selectYear: 'Rocznik',
+    activeVehicle: 'Dopasowanie do pojazdu:',
+    clearVehicle: 'Wyczyść pojazd',
+    allVehicles: 'Wszystkie auta',
+    fitsYourVehicle: 'Pasuje do Twojego auta'
   },
   product: {
     stockAvailable: '{count} sztuk w magazynie centralnym',

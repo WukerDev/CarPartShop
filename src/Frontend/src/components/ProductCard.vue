@@ -1,16 +1,16 @@
 <template>
   <v-card
     class="product-card h-100 d-flex flex-column rounded-xl"
-    color="#151D2C"
+    color="surface"
     elevation="4"
     border
   >
-    <div class="position-relative overflow-hidden" style="height: 200px; background-color: #0E1524;">
+    <div class="product-image-container position-relative overflow-hidden w-100">
       <v-img
         :src="part.imageUrl"
-        height="200"
+        aspect-ratio="1"
         cover
-        class="align-end"
+        class="align-end w-100 h-100"
       >
         <template #placeholder>
           <div class="d-flex align-center justify-center fill-height">
@@ -44,9 +44,21 @@
     </div>
 
     <v-card-text class="flex-grow-1 pb-2">
-      <div class="text-caption text-secondary font-weight-bold mb-1 d-flex align-center">
-        <v-icon icon="mdi-barcode" size="14" class="mr-1"></v-icon>
-        {{ $t('common.oem') }}: {{ part.partNumber }}
+      <div class="d-flex align-center justify-space-between mb-1">
+        <div class="text-caption text-secondary font-weight-bold d-flex align-center">
+          <v-icon icon="mdi-barcode" size="14" class="mr-1"></v-icon>
+          {{ $t('common.oem') }}: {{ part.partNumber }}
+        </div>
+        <v-chip
+          v-if="catalogStore.hasVehicleSelected && isVehicleMatch"
+          size="x-small"
+          color="teal-accent-4"
+          variant="flat"
+          class="font-weight-black text-black"
+          prepend-icon="mdi-check-decagram"
+        >
+          {{ $t('catalog.fitsYourVehicle') }}
+        </v-chip>
       </div>
 
       <h3 class="text-subtitle-1 font-weight-bold text-white mb-2 line-clamp-2">
@@ -112,9 +124,11 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { CarPart } from '@/types';
 import { useCartStore } from '@/stores/cartStore';
+import { useCatalogStore } from '@/stores/catalogStore';
 import { useSignalRStore } from '@/stores/signalrStore';
 
 const props = defineProps<{
@@ -127,7 +141,22 @@ defineEmits<{
 
 const { t } = useI18n();
 const cartStore = useCartStore();
+const catalogStore = useCatalogStore();
 const signalrStore = useSignalRStore();
+
+const isVehicleMatch = computed(() => {
+  if (!catalogStore.selectedMake) return false;
+  const comp = props.part.compatibility.toLowerCase();
+  if (comp.includes('uniwersaln')) return true;
+  const make = catalogStore.selectedMake.toLowerCase();
+  const isVw = make === 'volkswagen' || make === 'vw';
+  const matchesMake = comp.includes(make) || (isVw && (comp.includes('vw') || comp.includes('volkswagen')));
+  if (!matchesMake) return false;
+  if (catalogStore.selectedModel && !comp.includes(catalogStore.selectedModel.toLowerCase())) {
+    return false;
+  }
+  return true;
+});
 
 function addToCart() {
   cartStore.addItem(props.part, 1);
@@ -138,18 +167,23 @@ function addToCart() {
 <style scoped>
 .product-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(45, 212, 191, 0.12) !important;
 }
 
 .product-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(225, 29, 72, 0.4) !important;
-  box-shadow: 0 12px 24px -10px rgba(225, 29, 72, 0.2) !important;
+  border-color: rgba(20, 184, 166, 0.6) !important;
+  box-shadow: 0 12px 24px -10px rgba(20, 184, 166, 0.25) !important;
+}
+
+.product-image-container {
+  aspect-ratio: 1 / 1;
+  background-color: #061012;
 }
 
 .compatibility-box {
-  background-color: rgba(255, 255, 255, 0.04);
-  border-left: 3px solid #E11D48;
+  background-color: rgba(20, 184, 166, 0.08);
+  border-left: 3px solid #14B8A6;
 }
 
 .line-clamp-2 {

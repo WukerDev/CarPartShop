@@ -58,6 +58,14 @@ export interface ReturnRequestPayload {
   comments?: string;
 }
 
+export interface Vehicle {
+  id: number;
+  make: string;
+  model: string;
+  yearFrom: number;
+  yearTo: number;
+}
+
 export interface PaymentPayload {
   orderId: number;
   amount: number;

@@ -42,13 +42,34 @@ public class CatalogController : ControllerBase
         [FromQuery] string? search,
         [FromQuery] decimal? minPrice,
         [FromQuery] decimal? maxPrice,
-        [FromQuery] bool? inStockOnly)
+        [FromQuery] bool? inStockOnly,
+        [FromQuery] string? carMake,
+        [FromQuery] string? carModel,
+        [FromQuery] int? carYear)
     {
         var query = _dbContext.CarParts.Include(p => p.Category).AsQueryable();
 
         if (categoryId.HasValue && categoryId.Value > 0)
         {
             query = query.Where(p => p.CategoryId == categoryId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(carMake))
+        {
+            var makeLower = carMake.Trim().ToLower();
+            var isVw = makeLower == "volkswagen" || makeLower == "vw";
+            query = query.Where(p =>
+                p.Compatibility.ToLower().Contains("uniwersaln") ||
+                p.Compatibility.ToLower().Contains(makeLower) ||
+                (isVw && (p.Compatibility.ToLower().Contains("vw") || p.Compatibility.ToLower().Contains("volkswagen"))));
+        }
+
+        if (!string.IsNullOrWhiteSpace(carModel))
+        {
+            var modelLower = carModel.Trim().ToLower();
+            query = query.Where(p =>
+                p.Compatibility.ToLower().Contains("uniwersaln") ||
+                p.Compatibility.ToLower().Contains(modelLower));
         }
 
         if (!string.IsNullOrWhiteSpace(search))

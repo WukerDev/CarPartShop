@@ -25,6 +25,7 @@ export default {
     orders: 'My Orders',
     returns: 'Returns',
     searchPlaceholder: 'Search by name, OEM number (e.g. BRE, BOS), brand...',
+    searchButton: 'Search',
     liveHubTooltip: 'Real-time SignalR connection active',
     liveHub: 'Live Hub',
     adminRole: 'Store Administrator',
@@ -57,7 +58,18 @@ export default {
     emptyDesc: 'Try changing search parameters or resetting filters.',
     resetFilters: 'Reset filters',
     fitsTo: 'Fits among others:',
-    addToCart: 'Add to cart'
+    addToCart: 'Add to cart',
+    searchButton: 'Search',
+    searchHeroPlaceholder: 'Search part by name, vehicle model, or OEM number...',
+    vehicleSelectorTitle: 'Search Parts by Car Model',
+    vehicleSelectorDesc: 'Select make, model, and manufacturing year to find 100% compatible parts',
+    selectMake: 'Vehicle Make',
+    selectModel: 'Model',
+    selectYear: 'Year',
+    activeVehicle: 'Vehicle fitment:',
+    clearVehicle: 'Clear vehicle',
+    allVehicles: 'All vehicles',
+    fitsYourVehicle: 'Fits your vehicle'
   },
   product: {
     stockAvailable: '{count} units in central warehouse',

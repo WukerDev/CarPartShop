@@ -1,7 +1,7 @@
 <template>
-  <v-container class="py-6">
+  <v-container fluid class="py-6 px-4 px-md-8 mx-auto" style="max-width: 1760px;">
     <v-sheet
-      color="#151D2C"
+      color="surface"
       class="hero-banner pa-6 pa-md-10 rounded-2xl mb-8 position-relative overflow-hidden border"
     >
       <div class="position-relative z-1">
@@ -11,9 +11,34 @@
         <h1 class="text-h4 text-md-h3 font-weight-black text-white mb-3">
           {{ $t('hero.title') }}
         </h1>
-        <p class="text-body-1 text-grey-lighten-1 mb-6" style="max-width: 600px;">
+        <p class="text-body-1 text-grey-lighten-1 mb-6" style="max-width: 680px;">
           {{ $t('hero.description') }}
         </p>
+
+        <div class="hero-search-box pa-1 rounded-xl border d-flex align-center mb-6" style="max-width: 720px; background-color: #071314;">
+          <v-text-field
+            v-model="catalogStore.searchQuery"
+            :placeholder="$t('catalog.searchHeroPlaceholder')"
+            prepend-inner-icon="mdi-magnify"
+            variant="plain"
+            hide-details
+            density="comfortable"
+            class="px-3"
+            clearable
+            @keyup.enter="catalogStore.fetchParts"
+          ></v-text-field>
+          <v-btn
+            color="primary"
+            variant="flat"
+            size="large"
+            rounded="lg"
+            class="font-weight-black px-6 text-none elevation-2 text-subtitle-2 search-action-btn"
+            @click="catalogStore.fetchParts"
+          >
+            <v-icon icon="mdi-magnify" start size="22"></v-icon>
+            {{ $t('catalog.searchButton') }}
+          </v-btn>
+        </div>
 
         <div class="d-flex flex-wrap gap-4">
           <div class="d-flex align-center">
@@ -31,6 +56,99 @@
         </div>
       </div>
     </v-sheet>
+
+    <v-card
+      color="surface"
+      class="vehicle-selector-card pa-4 pa-md-6 rounded-2xl mb-8 border"
+      elevation="3"
+    >
+      <div class="d-flex flex-wrap align-center justify-space-between mb-4">
+        <div class="d-flex align-center">
+          <v-avatar color="primary" size="40" class="mr-3">
+            <v-icon icon="mdi-car-cog" color="black" size="24"></v-icon>
+          </v-avatar>
+          <div>
+            <div class="text-subtitle-1 font-weight-bold text-white d-flex align-center">
+              {{ $t('catalog.vehicleSelectorTitle') }}
+              <v-chip
+                v-if="catalogStore.hasVehicleSelected"
+                size="x-small"
+                color="secondary"
+                class="ml-2 font-weight-bold"
+                variant="flat"
+              >
+                {{ catalogStore.selectedVehicleDescription }}
+              </v-chip>
+            </div>
+            <div class="text-caption text-grey">
+              {{ $t('catalog.vehicleSelectorDesc') }}
+            </div>
+          </div>
+        </div>
+
+        <v-btn
+          v-if="catalogStore.hasVehicleSelected"
+          variant="text"
+          color="error"
+          size="small"
+          prepend-icon="mdi-close"
+          class="text-none mt-2 mt-sm-0"
+          @click="catalogStore.clearVehicleFilter()"
+        >
+          {{ $t('catalog.clearVehicle') }}
+        </v-btn>
+      </div>
+
+      <v-row dense class="align-center">
+        <v-col cols="12" sm="4">
+          <v-select
+            :model-value="catalogStore.selectedMake"
+            :items="catalogStore.vehicleMakes"
+            :label="$t('catalog.selectMake')"
+            prepend-inner-icon="mdi-car"
+            variant="outlined"
+            density="comfortable"
+            hide-details
+            rounded="lg"
+            clearable
+            :loading="catalogStore.loadingVehicles"
+            @update:model-value="catalogStore.setVehicleMake($event)"
+          ></v-select>
+        </v-col>
+
+        <v-col cols="12" sm="4">
+          <v-select
+            :model-value="catalogStore.selectedModel"
+            :items="catalogStore.vehicleModels"
+            :label="$t('catalog.selectModel')"
+            prepend-inner-icon="mdi-car-side"
+            variant="outlined"
+            density="comfortable"
+            hide-details
+            rounded="lg"
+            clearable
+            :disabled="!catalogStore.selectedMake"
+            @update:model-value="catalogStore.setVehicleModel($event)"
+          ></v-select>
+        </v-col>
+
+        <v-col cols="12" sm="4">
+          <v-select
+            :model-value="catalogStore.selectedYear"
+            :items="catalogStore.vehicleYears"
+            :label="$t('catalog.selectYear')"
+            prepend-inner-icon="mdi-calendar"
+            variant="outlined"
+            density="comfortable"
+            hide-details
+            rounded="lg"
+            clearable
+            :disabled="!catalogStore.selectedModel"
+            @update:model-value="catalogStore.setVehicleYear($event)"
+          ></v-select>
+        </v-col>
+      </v-row>
+    </v-card>
 
     <div class="mb-6">
       <div class="d-flex align-center justify-space-between mb-3">
@@ -102,35 +220,32 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="catalogStore.loading">
-      <v-col v-for="n in 6" :key="n" cols="12" sm="6" md="4" lg="4">
+    <div v-if="catalogStore.loading" class="catalog-grid">
+      <div v-for="n in 10" :key="n" class="catalog-grid-cell">
         <v-skeleton-loader
           type="image, article, actions"
-          color="#151D2C"
-          class="rounded-xl border"
+          color="surface"
+          class="rounded-xl border w-100"
         ></v-skeleton-loader>
-      </v-col>
-    </v-row>
+      </div>
+    </div>
 
-    <v-row v-else-if="catalogStore.filteredParts.length > 0">
-      <v-col
+    <div v-else-if="catalogStore.filteredParts.length > 0" class="catalog-grid">
+      <div
         v-for="part in catalogStore.filteredParts"
         :key="part.id"
-        cols="12"
-        sm="6"
-        md="4"
-        lg="4"
+        class="catalog-grid-cell"
       >
         <ProductCard
           :part="part"
           @view-details="openDetails"
         />
-      </v-col>
-    </v-row>
+      </div>
+    </div>
 
     <v-sheet
       v-else
-      color="#151D2C"
+      color="surface"
       class="pa-12 text-center rounded-2xl border my-8"
     >
       <v-icon icon="mdi-car-off" size="64" color="grey" class="mb-3"></v-icon>
@@ -170,8 +285,14 @@ const displayCategoryName = computed(() => {
 });
 
 onMounted(async () => {
-  await catalogStore.fetchCategories();
-  await catalogStore.fetchParts();
+  await Promise.all([
+    catalogStore.fetchCategories(),
+    catalogStore.fetchVehicleMakes(),
+    catalogStore.fetchParts()
+  ]);
+  if (catalogStore.selectedMake && catalogStore.vehicleModels.length === 0) {
+    await catalogStore.setVehicleMake(catalogStore.selectedMake);
+  }
 });
 
 function selectCategory(id: number | null) {
@@ -187,13 +308,28 @@ function resetFilters() {
   catalogStore.searchQuery = '';
   catalogStore.inStockOnly = false;
   catalogStore.setCategory(null);
+  catalogStore.clearVehicleFilter();
 }
 </script>
 
 <style scoped>
 .hero-banner {
-  background: linear-gradient(135deg, #151D2C 0%, #1E293B 100%);
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: linear-gradient(135deg, #0A1618 0%, #0F2528 50%, #0B191B 100%);
+  border-color: rgba(45, 212, 191, 0.15) !important;
+}
+
+.hero-search-box {
+  border-color: rgba(45, 212, 191, 0.25) !important;
+}
+
+.vehicle-selector-card {
+  border-color: rgba(45, 212, 191, 0.2) !important;
+  background-color: #0B181A !important;
+}
+
+.search-action-btn {
+  height: 48px !important;
+  font-size: 15px !important;
 }
 
 .z-1 {
@@ -202,5 +338,40 @@ function resetFilters() {
 
 .gap-4 {
   gap: 16px;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 20px;
+}
+
+@media (min-width: 600px) {
+  .catalog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .catalog-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .catalog-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1440px) {
+  .catalog-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.catalog-grid-cell {
+  display: flex;
+  min-width: 0;
 }
 </style>

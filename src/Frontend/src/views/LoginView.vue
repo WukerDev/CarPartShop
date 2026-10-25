@@ -1,6 +1,6 @@
 <template>
   <v-container class="py-12 d-flex justify-center">
-    <v-card color="#151D2C" max-width="480" width="100%" class="rounded-2xl pa-6 border" elevation="8">
+    <v-card color="surface" max-width="480" width="100%" class="rounded-2xl pa-6 border" elevation="8">
       <div class="text-center mb-6">
         <v-avatar color="primary" size="56" class="mb-3 elevation-2">
           <v-icon icon="mdi-shield-lock-outline" color="white" size="32"></v-icon>

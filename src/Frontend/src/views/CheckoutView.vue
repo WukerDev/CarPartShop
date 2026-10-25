@@ -2,7 +2,7 @@
   <v-container class="py-6">
     <v-sheet
       v-if="orderCompleted"
-      color="#151D2C"
+      color="surface"
       class="pa-8 pa-md-12 text-center rounded-2xl border my-8"
       max-width="650"
       style="margin: 0 auto;"
@@ -69,7 +69,7 @@
 
       <v-row>
         <v-col cols="12" md="7">
-          <v-card color="#151D2C" class="rounded-2xl pa-6 mb-6" border>
+          <v-card color="surface" class="rounded-2xl pa-6 mb-6" border>
             <h2 class="text-subtitle-1 font-weight-bold text-white mb-4 d-flex align-center">
               <v-icon icon="mdi-truck-delivery" color="primary" class="mr-2"></v-icon>
               {{ $t('checkout.deliveryDetails') }}
@@ -148,7 +148,7 @@
         </v-col>
 
         <v-col cols="12" md="5">
-          <v-card color="#151D2C" class="rounded-2xl pa-6" border>
+          <v-card color="surface" class="rounded-2xl pa-6" border>
             <h2 class="text-subtitle-1 font-weight-bold text-white mb-4">
               {{ $t('checkout.yourCart', { count: cartStore.itemCount }) }}
             </h2>

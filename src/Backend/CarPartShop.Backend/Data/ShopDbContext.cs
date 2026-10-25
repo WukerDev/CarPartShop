@@ -14,6 +14,7 @@ public class ShopDbContext : DbContext
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<ReturnRequest> ReturnRequests => Set<ReturnRequest>();
+    public DbSet<VehicleModel> Vehicles => Set<VehicleModel>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -73,6 +74,14 @@ public class ShopDbContext : DbContext
             entity.HasKey(r => r.Id);
             entity.Property(r => r.Reason).IsRequired().HasMaxLength(250);
             entity.Property(r => r.Status).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<VehicleModel>(entity =>
+        {
+            entity.HasKey(v => v.Id);
+            entity.Property(v => v.Make).IsRequired().HasMaxLength(100);
+            entity.Property(v => v.Model).IsRequired().HasMaxLength(100);
+            entity.HasIndex(v => new { v.Make, v.Model });
         });
     }
 }
