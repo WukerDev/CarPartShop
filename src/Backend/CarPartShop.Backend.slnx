@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CarPartShop.Backend.Tests/CarPartShop.Backend.Tests.csproj" />
+  <Project Path="CarPartShop.Backend/CarPartShop.Backend.csproj" />
+</Solution>
