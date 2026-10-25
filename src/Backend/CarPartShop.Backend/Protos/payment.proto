@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option csharp_namespace = "CarPartShop.Backend.Protos";
+
+package carpartshop.payment;
+
+service PaymentService {
+  rpc ProcessPayment (ProcessPaymentRequest) returns (ProcessPaymentResponse);
+}
+
+message ProcessPaymentRequest {
+  int32 order_id = 1;
+  double amount = 2;
+  string payment_method = 3; // Card, Blik, BankTransfer
+  string card_number = 4;
+  string card_expiry = 5;
+  string card_cvv = 6;
+  string blik_code = 7;
+}
+
+message ProcessPaymentResponse {
+  bool success = 1;
+  string transaction_id = 2;
+  string message = 3;
+  string payment_status = 4;
+  string processed_at = 5;
+}

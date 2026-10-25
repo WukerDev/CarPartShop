@@ -7,10 +7,12 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
+    "protoc": "node -e \"require('fs').mkdirSync('src/clients/generated', { recursive: true })\" && grpc_tools_node_protoc --ts_out=target=web,unary_rpc_promise=true,no_namespace:./src/clients/generated -I=../Protos catalog.proto order.proto payment.proto && node -e \"const fs=require('fs');['catalog.ts','order.ts','payment.ts'].forEach(f=>{const p='src/clients/generated/'+f;if(fs.existsSync(p)){let c=fs.readFileSync(p,'utf8').replace(/\\/\\*[\\s\\S]*?\\*\\//g,'').replace(/\\/\\/.*/g,'');fs.writeFileSync(p,c);}});fs.writeFileSync('src/clients/generated/index.ts','export * from \\'./catalog\\';\\nexport * from \\'./order\\';\\nexport * from \\'./payment\\';\\n');\"",
     "test:e2e": "playwright test",
     "test:unit": "vitest run"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "^2.16.0",
     "@mdi/font": "^7.4.47",
     "@microsoft/signalr": "^8.0.7",
     "google-protobuf": "^3.21.4",
@@ -22,10 +24,15 @@
     "vuetify": "^3.7.2"
   },
   "devDependencies": {
+    "@grpc/grpc-js": "^1.14.6",
     "@playwright/test": "^1.48.1",
     "@types/google-protobuf": "^3.15.12",
     "@types/node": "^22.7.7",
     "@vitejs/plugin-vue": "^5.1.4",
+    "grpc-tools": "^1.13.1",
+    "protoc": "^36.2.0",
+    "protoc-gen-ts": "^0.8.7",
+    "ts-proto": "^2.18.3",
     "typescript": "^5.6.3",
     "vite": "^5.4.9",
     "vite-plugin-vuetify": "^2.0.4",

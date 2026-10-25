@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+option csharp_namespace = "CarPartShop.Backend.Protos";
+
+package carpartshop.catalog;
+
+service CatalogService {
+  rpc GetCategories (GetCategoriesRequest) returns (GetCategoriesResponse);
+  rpc GetParts (GetPartsRequest) returns (GetPartsResponse);
+  rpc GetPartById (GetPartByIdRequest) returns (GetPartByIdResponse);
+}
+
+message GetCategoriesRequest {}
+
+message CategoryModel {
+  int32 id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  string icon = 5;
+  int32 parts_count = 6;
+}
+
+message GetCategoriesResponse {
+  repeated CategoryModel categories = 1;
+}
+
+message CarPartModel {
+  int32 id = 1;
+  string name = 2;
+  string part_number = 3;
+  int32 category_id = 4;
+  string category_name = 5;
+  string manufacturer = 6;
+  double price = 7;
+  int32 stock_quantity = 8;
+  string description = 9;
+  string compatibility = 10;
+  string image_url = 11;
+  double rating = 12;
+}
+
+message GetPartsRequest {
+  optional int32 category_id = 1;
+  optional string search = 2;
+  optional double min_price = 3;
+  optional double max_price = 4;
+  optional bool in_stock_only = 5;
+}
+
+message GetPartsResponse {
+  repeated CarPartModel parts = 1;
+  int32 total_count = 2;
+}
+
+message GetPartByIdRequest {
+  int32 id = 1;
+}
+
+message GetPartByIdResponse {
+  CarPartModel part = 1;
+}
