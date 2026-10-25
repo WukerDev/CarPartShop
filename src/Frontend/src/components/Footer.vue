@@ -5,55 +5,54 @@
         <v-col cols="12" md="4">
           <div class="d-flex align-center mb-3">
             <v-icon icon="mdi-car-turbocharger" color="primary" class="mr-2"></v-icon>
-            <span class="text-h6 font-weight-bold text-white">AUTOPARTS PRO</span>
+            <span class="text-h6 font-weight-bold text-white">{{ $t('common.brand') }} {{ $t('common.brandSuffix') }}</span>
           </div>
           <p class="text-body-2 text-grey">
-            Profesjonalny sklep z częściami do samochodów osobowych i dostawczych.
-            Oryginalne części OEM oraz sprawdzone zamienniki wiodących marek.
+            {{ $t('footer.about') }}
           </p>
           <div class="d-flex mt-3">
-            <v-chip size="small" color="primary" variant="outlined" class="mr-2">Gwarancja 24m</v-chip>
-            <v-chip size="small" color="secondary" variant="outlined" class="mr-2">Wysyłka 24h</v-chip>
-            <v-chip size="small" color="success" variant="outlined">Łatwy zwrot 30 dni</v-chip>
+            <v-chip size="small" color="primary" variant="outlined" class="mr-2">{{ $t('footer.badges.warranty') }}</v-chip>
+            <v-chip size="small" color="secondary" variant="outlined" class="mr-2">{{ $t('footer.badges.shipping') }}</v-chip>
+            <v-chip size="small" color="success" variant="outlined">{{ $t('footer.badges.easyReturns') }}</v-chip>
           </div>
         </v-col>
 
         <v-col cols="6" md="2">
-          <div class="text-subtitle-1 font-weight-bold text-white mb-2">Kategorie</div>
+          <div class="text-subtitle-1 font-weight-bold text-white mb-2">{{ $t('footer.categoriesTitle') }}</div>
           <div class="d-flex flex-column gap-1 text-caption text-grey">
-            <span class="cursor-pointer hover-text">Układ Hamulcowy</span>
-            <span class="cursor-pointer hover-text">Zawieszenie i Amortyzatory</span>
-            <span class="cursor-pointer hover-text">Filtry i Oleje silnikowe</span>
-            <span class="cursor-pointer hover-text">Rozrząd i Silnik</span>
-            <span class="cursor-pointer hover-text">Układ Zapłonowy</span>
+            <span class="cursor-pointer hover-text">{{ $t('footer.categories.brakes') }}</span>
+            <span class="cursor-pointer hover-text">{{ $t('footer.categories.suspension') }}</span>
+            <span class="cursor-pointer hover-text">{{ $t('footer.categories.filters') }}</span>
+            <span class="cursor-pointer hover-text">{{ $t('footer.categories.engine') }}</span>
+            <span class="cursor-pointer hover-text">{{ $t('footer.categories.ignition') }}</span>
           </div>
         </v-col>
 
         <v-col cols="6" md="3">
-          <div class="text-subtitle-1 font-weight-bold text-white mb-2">Technologie i Architektura</div>
+          <div class="text-subtitle-1 font-weight-bold text-white mb-2">{{ $t('footer.techTitle') }}</div>
           <div class="d-flex flex-column gap-1 text-caption text-grey">
-            <span>• ASP.NET Core (.NET 10) & Entity Framework</span>
-            <span>• gRPC & gRPC-Web (Protobuf contracts)</span>
-            <span>• SignalR Real-time Hub Updates</span>
-            <span>• YARP Reverse Proxy (/identity, /portal, /api)</span>
-            <span>• Keycloak Authority & PostgreSQL DB</span>
-            <span>• Vue 3, TypeScript, Pinia, Vuetify 3</span>
+            <span>{{ $t('footer.tech.aspnet') }}</span>
+            <span>{{ $t('footer.tech.grpc') }}</span>
+            <span>{{ $t('footer.tech.signalr') }}</span>
+            <span>{{ $t('footer.tech.yarp') }}</span>
+            <span>{{ $t('footer.tech.keycloak') }}</span>
+            <span>{{ $t('footer.tech.vue') }}</span>
           </div>
         </v-col>
 
         <v-col cols="12" md="3">
-          <div class="text-subtitle-1 font-weight-bold text-white mb-2">Kontakt i Pomoc</div>
+          <div class="text-subtitle-1 font-weight-bold text-white mb-2">{{ $t('footer.contactTitle') }}</div>
           <div class="text-body-2 text-grey mb-1">
             <v-icon icon="mdi-phone" size="18" class="mr-1"></v-icon>
-            Infolinia: +48 22 123 45 67
+            {{ $t('footer.helpline') }}
           </div>
           <div class="text-body-2 text-grey mb-1">
             <v-icon icon="mdi-email" size="18" class="mr-1"></v-icon>
-            pomoc@autopartspro.local
+            {{ $t('footer.email') }}
           </div>
           <div class="text-body-2 text-grey">
             <v-icon icon="mdi-clock-outline" size="18" class="mr-1"></v-icon>
-            Pn - Pt: 8:00 - 18:00, Sob: 9:00 - 14:00
+            {{ $t('footer.hours') }}
           </div>
         </v-col>
       </v-row>
@@ -61,8 +60,8 @@
       <v-divider class="my-6 border-opacity-25"></v-divider>
 
       <div class="d-flex flex-column flex-sm-row justify-space-between align-center text-caption text-grey">
-        <span>© 2026 AutoParts Pro Sp. z o.o. Wszelkie prawa zastrzeżone.</span>
-        <span>Zintegrowana bramka YARP + Keycloak Authority + PostgreSQL + Docker Compose</span>
+        <span>{{ $t('footer.copyright') }}</span>
+        <span>{{ $t('footer.subtitle') }}</span>
       </div>
     </v-container>
   </v-footer>

@@ -4,7 +4,7 @@
       <v-card-title class="d-flex justify-space-between align-center px-4 pt-4">
         <div class="d-flex align-center">
           <v-chip color="primary" size="small" class="mr-2 font-weight-bold">{{ part.manufacturer }}</v-chip>
-          <span class="text-caption text-secondary font-weight-bold">OEM: {{ part.partNumber }}</span>
+          <span class="text-caption text-secondary font-weight-bold">{{ $t('common.oem') }}: {{ part.partNumber }}</span>
         </div>
         <v-btn icon="mdi-close" variant="text" size="small" @click="$emit('update:modelValue', false)"></v-btn>
       </v-card-title>
@@ -29,13 +29,13 @@
               </div>
 
               <div class="text-h5 font-weight-black text-primary mb-3">
-                {{ part.price.toFixed(2) }} <span class="text-body-1 font-weight-normal">PLN</span>
+                {{ part.price.toFixed(2) }} <span class="text-body-1 font-weight-normal">{{ $t('common.currency') }}</span>
               </div>
 
               <div class="d-flex align-center mb-2">
-                <span class="text-caption text-grey mr-2">Dostępność magazynowa:</span>
+                <span class="text-caption text-grey mr-2">{{ $t('product.stockAvailability') }}</span>
                 <v-chip :color="part.stockQuantity > 0 ? 'success' : 'error'" size="x-small" variant="flat">
-                  {{ part.stockQuantity > 0 ? `${part.stockQuantity} sztuk w magazynie centralnym` : 'Brak na stanie' }}
+                  {{ part.stockQuantity > 0 ? $t('product.stockAvailable', { count: part.stockQuantity }) : $t('product.outOfStock') }}
                 </v-chip>
               </div>
             </div>
@@ -46,7 +46,7 @@
                 type="number"
                 min="1"
                 :max="part.stockQuantity"
-                label="Ilość"
+                :label="$t('product.quantity')"
                 density="compact"
                 variant="outlined"
                 hide-details
@@ -63,7 +63,7 @@
                 rounded="lg"
                 @click="onAddToCart"
               >
-                Dodaj do koszyka
+                {{ $t('product.addToCart') }}
               </v-btn>
             </div>
           </v-col>
@@ -72,10 +72,10 @@
         <v-divider class="my-4"></v-divider>
 
         <div>
-          <h4 class="text-subtitle-2 font-weight-bold text-white mb-1">Opis części i parametry techniczne</h4>
+          <h4 class="text-subtitle-2 font-weight-bold text-white mb-1">{{ $t('product.description') }}</h4>
           <p class="text-body-2 text-grey-lighten-1 mb-4">{{ part.description }}</p>
 
-          <h4 class="text-subtitle-2 font-weight-bold text-white mb-1">Kompatybilność z pojazdami</h4>
+          <h4 class="text-subtitle-2 font-weight-bold text-white mb-1">{{ $t('product.compatibility') }}</h4>
           <v-sheet color="rgba(255,255,255,0.03)" class="pa-3 rounded-lg border">
             <div class="text-body-2 text-white font-weight-medium">
               <v-icon icon="mdi-car-side" color="secondary" size="18" class="mr-2"></v-icon>
@@ -90,6 +90,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { CarPart } from '@/types';
 import { useCartStore } from '@/stores/cartStore';
 import { useSignalRStore } from '@/stores/signalrStore';
@@ -103,6 +104,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', val: boolean): void;
 }>();
 
+const { t } = useI18n();
 const quantity = ref(1);
 const cartStore = useCartStore();
 const signalrStore = useSignalRStore();
@@ -110,7 +112,7 @@ const signalrStore = useSignalRStore();
 function onAddToCart() {
   if (props.part) {
     cartStore.addItem(props.part, quantity.value);
-    signalrStore.addNotification('success', `Dodano do koszyka: ${props.part.name} (${quantity.value} szt.)`);
+    signalrStore.addNotification('success', t('notifications.addedToCartQty', { name: props.part.name, quantity: quantity.value }));
     emit('update:modelValue', false);
     quantity.value = 1;
   }

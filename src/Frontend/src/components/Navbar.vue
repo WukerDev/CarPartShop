@@ -1,22 +1,20 @@
 <template>
   <v-app-bar color="#111827" elevation="3" class="px-3" border="b">
     <v-container class="d-flex align-center py-0" fluid>
-      <!-- Logo -->
       <router-link to="/" class="d-flex align-center text-decoration-none mr-6">
         <v-avatar color="primary" size="40" class="mr-2 elevation-2">
           <v-icon icon="mdi-car-turbocharger" color="white" size="24"></v-icon>
         </v-avatar>
         <div class="d-flex flex-column">
           <span class="text-h6 font-weight-bold text-white tracking-wide" style="line-height: 1.1;">
-            AUTOPARTS<span class="text-primary font-weight-black">PRO</span>
+            {{ $t('common.brand') }}<span class="text-primary font-weight-black">{{ $t('common.brandSuffix') }}</span>
           </span>
           <span class="text-caption text-grey-lighten-1" style="font-size: 10px !important;">
-            Oryginalne części i zamienniki OEM
+            {{ $t('navbar.subtitle') }}
           </span>
         </div>
       </router-link>
 
-      <!-- Category quick buttons -->
       <div class="d-none d-md-flex align-center mr-4">
         <v-btn
           variant="text"
@@ -24,7 +22,7 @@
           to="/"
           class="text-none"
         >
-          Katalog
+          {{ $t('navbar.catalog') }}
         </v-btn>
         <v-btn
           variant="text"
@@ -32,7 +30,7 @@
           to="/orders"
           class="text-none"
         >
-          Moje Zamówienia
+          {{ $t('navbar.orders') }}
         </v-btn>
         <v-btn
           variant="text"
@@ -40,16 +38,15 @@
           to="/returns"
           class="text-none"
         >
-          Zwroty
+          {{ $t('navbar.returns') }}
         </v-btn>
       </div>
 
       <v-spacer></v-spacer>
 
-      <!-- Search bar -->
       <v-text-field
         v-model="catalogStore.searchQuery"
-        placeholder="Szukaj po nazwie, nr OEM (np. BRE, BOS), marce..."
+        :placeholder="$t('navbar.searchPlaceholder')"
         prepend-inner-icon="mdi-magnify"
         variant="solo-filled"
         density="compact"
@@ -62,8 +59,7 @@
         @update:model-value="onSearch"
       ></v-text-field>
 
-      <!-- Real-time SignalR indicator -->
-      <v-tooltip location="bottom" text="Połączenie SignalR w czasie rzeczywistym aktywne">
+      <v-tooltip location="bottom" :text="$t('navbar.liveHubTooltip')">
         <template #activator="{ props }">
           <v-chip
             v-bind="props"
@@ -73,12 +69,40 @@
             class="mr-3 d-none d-lg-flex"
             prepend-icon="mdi-circle-medium"
           >
-            Live Hub
+            {{ $t('navbar.liveHub') }}
           </v-chip>
         </template>
       </v-tooltip>
 
-      <!-- Cart Icon with badge -->
+      <v-menu location="bottom end">
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            variant="text"
+            size="small"
+            class="text-none mr-2 font-weight-bold"
+            rounded="lg"
+          >
+            <v-icon icon="mdi-translate" class="mr-1"></v-icon>
+            <span>{{ currentLocaleLabel }}</span>
+          </v-btn>
+        </template>
+        <v-list bg-color="#1F2937" elevation="4" rounded="lg">
+          <v-list-item
+            :active="currentLocale === 'pl'"
+            @click="switchLanguage('pl')"
+          >
+            <v-list-item-title>🇵🇱 {{ $t('common.polish') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item
+            :active="currentLocale === 'en'"
+            @click="switchLanguage('en')"
+          >
+            <v-list-item-title>🇬🇧 {{ $t('common.english') }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+
       <v-btn icon to="/cart" class="mr-2">
         <v-badge
           :content="cartStore.itemCount"
@@ -90,7 +114,6 @@
         </v-badge>
       </v-btn>
 
-      <!-- User Profile Menu -->
       <v-menu location="bottom end">
         <template #activator="{ props }">
           <v-btn
@@ -101,7 +124,7 @@
             rounded="lg"
           >
             <v-icon icon="mdi-account-circle" class="mr-1"></v-icon>
-            <span class="d-none d-sm-inline">{{ authStore.userName }}</span>
+            <span class="d-none d-sm-inline">{{ authStore.user?.username || $t('common.guest') }}</span>
           </v-btn>
         </template>
 
@@ -112,18 +135,18 @@
             </template>
             <v-list-item-title class="font-weight-bold">{{ authStore.user?.username }}</v-list-item-title>
             <v-list-item-subtitle class="text-caption text-grey">
-              {{ authStore.isAdmin ? 'Administrator sklepu' : 'Klient' }}
+              {{ authStore.isAdmin ? $t('navbar.adminRole') : $t('navbar.clientRole') }}
             </v-list-item-subtitle>
           </v-list-item>
 
           <v-divider v-if="authStore.isAuthenticated"></v-divider>
 
           <v-list-item to="/orders" prepend-icon="mdi-package-variant-closed">
-            Historia zamówień
+            {{ $t('navbar.orderHistory') }}
           </v-list-item>
 
           <v-list-item to="/returns" prepend-icon="mdi-keyboard-return">
-            Zgłoszone zwroty
+            {{ $t('navbar.reportedReturns') }}
           </v-list-item>
 
           <v-divider></v-divider>
@@ -134,7 +157,7 @@
             color="error"
             @click="authStore.logout"
           >
-            Wyloguj się
+            {{ $t('navbar.logout') }}
           </v-list-item>
 
           <v-list-item
@@ -143,7 +166,7 @@
             prepend-icon="mdi-login"
             color="primary"
           >
-            Zaloguj się
+            {{ $t('navbar.login') }}
           </v-list-item>
         </v-list>
       </v-menu>
@@ -152,13 +175,24 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useCartStore } from '@/stores/cartStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useCatalogStore } from '@/stores/catalogStore';
+import { setLanguage } from '@/plugins/i18n';
 
+const { locale } = useI18n();
 const cartStore = useCartStore();
 const authStore = useAuthStore();
 const catalogStore = useCatalogStore();
+
+const currentLocale = computed(() => locale.value);
+const currentLocaleLabel = computed(() => locale.value.toUpperCase());
+
+function switchLanguage(lang: 'pl' | 'en') {
+  setLanguage(lang);
+}
 
 function onSearch() {
   catalogStore.fetchParts();

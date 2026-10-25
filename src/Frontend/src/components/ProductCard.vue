@@ -5,7 +5,6 @@
     elevation="4"
     border
   >
-    <!-- Part Image with Badge -->
     <div class="position-relative overflow-hidden" style="height: 200px; background-color: #0E1524;">
       <v-img
         :src="part.imageUrl"
@@ -20,7 +19,6 @@
         </template>
       </v-img>
 
-      <!-- Manufacturer Chip -->
       <v-chip
         size="x-small"
         color="primary"
@@ -30,7 +28,6 @@
         {{ part.manufacturer }}
       </v-chip>
 
-      <!-- Stock status chip -->
       <v-chip
         size="x-small"
         :color="part.stockQuantity > 0 ? 'success' : 'error'"
@@ -42,35 +39,30 @@
           size="12"
           class="mr-1"
         ></v-icon>
-        {{ part.stockQuantity > 0 ? `${part.stockQuantity} szt.` : 'Brak' }}
+        {{ part.stockQuantity > 0 ? `${part.stockQuantity} ${$t('common.pieces')}` : $t('common.outOfStock') }}
       </v-chip>
     </div>
 
-    <!-- Content -->
     <v-card-text class="flex-grow-1 pb-2">
-      <!-- OEM Number -->
       <div class="text-caption text-secondary font-weight-bold mb-1 d-flex align-center">
         <v-icon icon="mdi-barcode" size="14" class="mr-1"></v-icon>
-        OEM: {{ part.partNumber }}
+        {{ $t('common.oem') }}: {{ part.partNumber }}
       </div>
 
-      <!-- Title -->
       <h3 class="text-subtitle-1 font-weight-bold text-white mb-2 line-clamp-2">
         {{ part.name }}
       </h3>
 
-      <!-- Compatibility Snippet -->
       <div class="compatibility-box pa-2 rounded-lg mb-3">
         <div class="text-caption text-grey-lighten-1 font-weight-medium d-flex align-center">
           <v-icon icon="mdi-car-info" size="14" class="mr-1 text-primary"></v-icon>
-          Pasuje m.in. do:
+          {{ $t('catalog.fitsTo') }}
         </div>
         <div class="text-caption text-white text-truncate font-weight-bold">
           {{ part.compatibility }}
         </div>
       </div>
 
-      <!-- Rating and Reviews -->
       <div class="d-flex align-center mb-2">
         <v-rating
           :model-value="part.rating"
@@ -84,12 +76,11 @@
       </div>
     </v-card-text>
 
-    <!-- Footer with Price and Add to Cart -->
     <v-card-actions class="px-4 pb-4 pt-0 d-flex justify-space-between align-center">
       <div>
-        <div class="text-caption text-grey">Cena brutto</div>
+        <div class="text-caption text-grey">{{ $t('common.grossPrice') }}</div>
         <div class="text-h6 font-weight-black text-primary">
-          {{ part.price.toFixed(2) }} <span class="text-body-2 font-weight-medium">PLN</span>
+          {{ part.price.toFixed(2) }} <span class="text-body-2 font-weight-medium">{{ $t('common.currency') }}</span>
         </div>
       </div>
 
@@ -113,7 +104,7 @@
           rounded="lg"
           @click="addToCart"
         >
-          Do koszyka
+          {{ $t('catalog.addToCart') }}
         </v-btn>
       </div>
     </v-card-actions>
@@ -121,6 +112,7 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import type { CarPart } from '@/types';
 import { useCartStore } from '@/stores/cartStore';
 import { useSignalRStore } from '@/stores/signalrStore';
@@ -133,12 +125,13 @@ defineEmits<{
   (e: 'view-details', part: CarPart): void;
 }>();
 
+const { t } = useI18n();
 const cartStore = useCartStore();
 const signalrStore = useSignalRStore();
 
 function addToCart() {
   cartStore.addItem(props.part, 1);
-  signalrStore.addNotification('success', `Dodano do koszyka: ${props.part.name}`);
+  signalrStore.addNotification('success', t('notifications.addedToCart', { name: props.part.name }));
 }
 </script>
 

@@ -14,6 +14,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
+  test: {
+    exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**']
+  },
   server: {
     port: 5173,
     host: '0.0.0.0',
@@ -33,4 +36,4 @@ export default defineConfig({
       }
     }
   }
-});
+} as any);

@@ -1,17 +1,10 @@
 <template>
   <v-app>
-    <!-- Navbar -->
     <Navbar />
-
-    <!-- Main Content -->
     <v-main class="bg-background">
       <router-view />
     </v-main>
-
-    <!-- Global Footer -->
     <Footer />
-
-    <!-- Real-time SignalR notifications toast -->
     <NotificationToast />
   </v-app>
 </template>
@@ -26,7 +19,6 @@ import { useSignalRStore } from '@/stores/signalrStore';
 const signalrStore = useSignalRStore();
 
 onMounted(() => {
-  // Initialize real-time connection
   signalrStore.init();
 });
 </script>
@@ -38,7 +30,6 @@ body {
   color: #F3F4F6;
 }
 
-/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
