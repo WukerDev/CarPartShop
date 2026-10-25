@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+option csharp_namespace = "CarPartShop.Backend.Protos";
+
+package carpartshop.orders;
+
+service OrderService {
+  rpc CreateOrder (CreateOrderRequest) returns (OrderResponse);
+  rpc GetOrders (GetOrdersRequest) returns (GetOrdersResponse);
+  rpc GetOrderById (GetOrderByIdRequest) returns (OrderResponse);
+  rpc RequestReturn (RequestReturnRequest) returns (RequestReturnResponse);
+}
+
+message OrderItemInput {
+  int32 part_id = 1;
+  int32 quantity = 2;
+}
+
+message CreateOrderRequest {
+  string customer_name = 1;
+  string email = 2;
+  string phone = 3;
+  string shipping_address = 4;
+  string payment_method = 5;
+  repeated OrderItemInput items = 6;
+}
+
+message OrderItemModel {
+  int32 id = 1;
+  int32 part_id = 2;
+  string part_name = 3;
+  string part_number = 4;
+  int32 quantity = 5;
+  double unit_price = 6;
+  double total_price = 7;
+}
+
+message OrderResponse {
+  int32 id = 1;
+  string customer_name = 2;
+  string email = 3;
+  string phone = 4;
+  string shipping_address = 5;
+  string status = 6; // Created, Paid, Processing, Shipped, Completed, ReturnRequested, Returned, Cancelled
+  double total_price = 7;
+  string created_at = 8;
+  string payment_method = 9;
+  string return_status = 10;
+  string return_reason = 11;
+  repeated OrderItemModel items = 12;
+}
+
+message GetOrdersRequest {
+  optional string user_id = 1;
+  optional string email = 2;
+}
+
+message GetOrdersResponse {
+  repeated OrderResponse orders = 1;
+}
+
+message GetOrderByIdRequest {
+  int32 id = 1;
+}
+
+message RequestReturnRequest {
+  int32 order_id = 1;
+  string reason = 2;
+  string comments = 3;
+}
+
+message RequestReturnResponse {
+  bool success = 1;
+  string message = 2;
+  int32 order_id = 3;
+  string new_status = 4;
+}
