@@ -1,0 +1,87 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: carpartshop_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: carpartshop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d carpartshop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.5
+    container_name: carpartshop_keycloak
+    restart: always
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_RELATIVE_PATH: /identity
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+    volumes:
+      - ./keycloak/carpartshop-realm.json:/opt/keycloak/data/import/carpartshop-realm.json:ro
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: .
+      dockerfile: src/Backend/CarPartShop.Backend/Dockerfile
+    container_name: carpartshop_backend
+    restart: always
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=carpartshop;Username=postgres;Password=postgres"
+      Authentication__Authority: "http://keycloak:8080/identity/realms/carpartshop"
+      Authentication__Audience: "account"
+      Authentication__RequireHttpsMetadata: "false"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://+:5001"
+    ports:
+      - "5001:5001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: src/Frontend/Dockerfile
+    container_name: carpartshop_frontend
+    restart: always
+    ports:
+      - "5173:80"
+
+  gateway:
+    build:
+      context: .
+      dockerfile: src/Gateway/CarPartShop.Gateway/Dockerfile
+    container_name: carpartshop_gateway
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://+:5000"
+      ReverseProxy__Clusters__keycloak-cluster__Destinations__destination1__Address: "http://keycloak:8080"
+      ReverseProxy__Clusters__backend-cluster__Destinations__destination1__Address: "http://backend:5001"
+      ReverseProxy__Clusters__frontend-cluster__Destinations__destination1__Address: "http://frontend:80"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - backend
+      - keycloak
+      - frontend
+
+volumes:
+  pgdata:
