@@ -1,0 +1,128 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using CarPartShop.Backend.Data;
+using CarPartShop.Backend.Models;
+
+namespace CarPartShop.Backend.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class CatalogController : ControllerBase
+{
+    private readonly ShopDbContext _dbContext;
+
+    public CatalogController(ShopDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    [HttpGet("categories")]
+    public async Task<IActionResult> GetCategories()
+    {
+        var categories = await _dbContext.Categories
+            .Include(c => c.Parts)
+            .OrderBy(c => c.Name)
+            .Select(c => new
+            {
+                c.Id,
+                c.Name,
+                c.Slug,
+                c.Description,
+                c.Icon,
+                PartsCount = c.Parts.Count
+            })
+            .ToListAsync();
+
+        return Ok(categories);
+    }
+
+    [HttpGet("parts")]
+    public async Task<IActionResult> GetParts(
+        [FromQuery] int? categoryId,
+        [FromQuery] string? search,
+        [FromQuery] decimal? minPrice,
+        [FromQuery] decimal? maxPrice,
+        [FromQuery] bool? inStockOnly)
+    {
+        var query = _dbContext.CarParts.Include(p => p.Category).AsQueryable();
+
+        if (categoryId.HasValue && categoryId.Value > 0)
+        {
+            query = query.Where(p => p.CategoryId == categoryId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.ToLower();
+            query = query.Where(p =>
+                p.Name.ToLower().Contains(s) ||
+                p.PartNumber.ToLower().Contains(s) ||
+                p.Manufacturer.ToLower().Contains(s) ||
+                p.Compatibility.ToLower().Contains(s));
+        }
+
+        if (minPrice.HasValue && minPrice.Value > 0)
+        {
+            query = query.Where(p => p.Price >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue && maxPrice.Value > 0)
+        {
+            query = query.Where(p => p.Price <= maxPrice.Value);
+        }
+
+        if (inStockOnly.HasValue && inStockOnly.Value)
+        {
+            query = query.Where(p => p.StockQuantity > 0);
+        }
+
+        var totalCount = await query.CountAsync();
+        var parts = await query.OrderBy(p => p.Name).ToListAsync();
+
+        return Ok(new
+        {
+            TotalCount = totalCount,
+            Parts = parts.Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.PartNumber,
+                p.CategoryId,
+                CategoryName = p.Category?.Name ?? "",
+                p.Manufacturer,
+                Price = (double)p.Price,
+                p.StockQuantity,
+                p.Description,
+                p.Compatibility,
+                p.ImageUrl,
+                p.Rating
+            })
+        });
+    }
+
+    [HttpGet("parts/{id:int}")]
+    public async Task<IActionResult> GetPartById(int id)
+    {
+        var part = await _dbContext.CarParts.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+        if (part == null)
+        {
+            return NotFound(new { message = $"Część o ID {id} nie została znaleziona." });
+        }
+
+        return Ok(new
+        {
+            part.Id,
+            part.Name,
+            part.PartNumber,
+            part.CategoryId,
+            CategoryName = part.Category?.Name ?? "",
+            part.Manufacturer,
+            Price = (double)part.Price,
+            part.StockQuantity,
+            part.Description,
+            part.Compatibility,
+            part.ImageUrl,
+            part.Rating
+        });
+    }
+}
