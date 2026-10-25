@@ -25,6 +25,8 @@ export default {
     orders: 'My Orders',
     returns: 'Returns',
     wishlist: 'Wishlist',
+    userPanel: 'User Panel',
+    userPanelSub: 'Saved details for later',
     userProfile: 'My Profile & Shipping Data',
     searchPlaceholder: 'Search by name, OEM number (e.g. BRE, BOS), brand...',
     searchButton: 'Search',
@@ -58,6 +60,9 @@ export default {
     emptyDesc: 'Try changing search parameters or resetting filters.',
     resetFilters: 'Reset filters',
     fitsTo: 'Fits among others:',
+    userPanelBannerTitle: 'User Panel – Express Delivery Details',
+    userPanelBannerDesc: 'Save your delivery address and phone once to enjoy quick 1-click ordering without typing addresses again.',
+    userPanelBannerBtn: 'Open User Panel',
     addToCart: 'Add to cart',
     searchButton: 'Search',
     searchHeroPlaceholder: 'Search part by name, vehicle model, or OEM number...',
@@ -97,6 +102,8 @@ export default {
     applyCoupon: 'Apply',
     couponAppliedSuccess: 'Coupon {code} applied successfully!',
     securityBadge: 'Payment protected by SSL certificate & Mock Gateway',
+    userPanelPrompt: 'Save shipping details in User Panel for 1-click orders.',
+    userPanelLink: 'User Panel',
     emptyTitle: 'Your cart is empty',
     emptyDesc: 'You have not added any parts to your cart yet.',
     backToCatalog: 'Back to browsing parts'
@@ -146,6 +153,7 @@ export default {
     dpdOption: 'DPD Courier 24h (Direct door-to-door delivery)',
     saveAddressCheckbox: 'Remember this shipping profile for future orders',
     savedAddressLoaded: 'Prefilled from your saved shipping profile',
+    editInProfile: 'User Panel',
     nameLabel: 'Full name',
     namePlaceholder: 'John Doe',
     nameRequired: 'Full name is required',
@@ -296,6 +304,7 @@ export default {
   profile: {
     title: 'User Profile Panel',
     subtitle: 'Manage your default order and shipping details for future purchases',
+    newBadge: 'Quick Checkout',
     ordersStat: 'Order history',
     wishlistStat: 'Wishlist items',
     returnsStat: 'Submitted returns',
@@ -331,6 +340,13 @@ export default {
       filters: 'Filters & Motor Oils',
       engine: 'Timing & Engine',
       ignition: 'Ignition System'
+    },
+    accountTitle: 'Customer Zone',
+    account: {
+      profile: 'User Panel (My Data)',
+      orders: 'Order History',
+      returns: 'Returns Center',
+      wishlist: 'Wishlist'
     },
     contactTitle: 'Contact & Support',
     helpline: 'Hotline: +48 22 123 45 67',

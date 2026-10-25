@@ -80,15 +80,27 @@
       <v-row>
         <v-col cols="12" md="7">
           <v-card color="surface" class="rounded-2xl pa-6 mb-6" border>
-            <div class="d-flex align-center justify-space-between mb-4">
+            <div class="d-flex align-center justify-space-between mb-4 flex-wrap gap-2">
               <h2 class="text-subtitle-1 font-weight-bold text-white d-flex align-center mb-0">
                 <v-icon icon="mdi-account-outline" color="primary" class="mr-2"></v-icon>
                 {{ $t('checkout.deliveryDetails') }}
               </h2>
-              <v-chip v-if="hasSavedProfile" size="x-small" color="primary" variant="tonal" class="font-weight-bold">
-                <v-icon icon="mdi-check-decagram" size="12" class="mr-1"></v-icon>
-                {{ $t('checkout.savedAddressLoaded') }}
-              </v-chip>
+              <div class="d-flex align-center gap-2">
+                <v-chip v-if="hasSavedProfile" size="x-small" color="success" variant="tonal" class="font-weight-bold">
+                  <v-icon icon="mdi-check-decagram" size="12" class="mr-1"></v-icon>
+                  {{ $t('checkout.savedAddressLoaded') }}
+                </v-chip>
+                <v-btn
+                  size="x-small"
+                  variant="outlined"
+                  color="primary"
+                  to="/profile"
+                  prepend-icon="mdi-card-account-details-outline"
+                  class="text-none font-weight-bold"
+                >
+                  {{ $t('checkout.editInProfile') }}
+                </v-btn>
+              </div>
             </div>
 
             <v-form ref="formRef" @submit.prevent="proceedToPayment">

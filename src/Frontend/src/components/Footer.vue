@@ -2,7 +2,7 @@
   <v-footer color="#071314" border="t" class="py-6 mt-12">
     <v-container>
       <v-row>
-        <v-col cols="12" md="5">
+        <v-col cols="12" md="4">
           <div class="d-flex align-center mb-3">
             <v-icon icon="mdi-car-turbocharger" color="primary" class="mr-2"></v-icon>
             <span class="text-h6 font-weight-bold text-white">{{ $t('common.brand') }} {{ $t('common.brandSuffix') }}</span>
@@ -28,7 +28,26 @@
           </div>
         </v-col>
 
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6" md="2">
+          <div class="text-subtitle-1 font-weight-bold text-white mb-2">{{ $t('footer.accountTitle') }}</div>
+          <div class="d-flex flex-column gap-1 text-caption text-grey">
+            <router-link to="/profile" class="text-decoration-none text-primary font-weight-bold hover-text d-flex align-center">
+              <v-icon icon="mdi-card-account-details-outline" size="14" class="mr-1"></v-icon>
+              {{ $t('footer.account.profile') }}
+            </router-link>
+            <router-link to="/orders" class="text-decoration-none text-grey hover-text">
+              {{ $t('footer.account.orders') }}
+            </router-link>
+            <router-link to="/returns" class="text-decoration-none text-grey hover-text">
+              {{ $t('footer.account.returns') }}
+            </router-link>
+            <router-link to="/wishlist" class="text-decoration-none text-grey hover-text">
+              {{ $t('footer.account.wishlist') }}
+            </router-link>
+          </div>
+        </v-col>
+
+        <v-col cols="12" sm="6" md="3">
           <div class="text-subtitle-1 font-weight-bold text-white mb-2">{{ $t('footer.contactTitle') }}</div>
           <div class="text-body-2 text-grey mb-1">
             <v-icon icon="mdi-phone" size="18" class="mr-1"></v-icon>
@@ -59,7 +78,7 @@
   gap: 6px;
 }
 .hover-text:hover {
-  color: #fff;
+  color: #fff !important;
 }
 .cursor-pointer {
   cursor: pointer;

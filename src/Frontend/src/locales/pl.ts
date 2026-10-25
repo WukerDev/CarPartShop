@@ -25,6 +25,8 @@ export default {
     orders: 'Moje Zamówienia',
     returns: 'Zwroty',
     wishlist: 'Ulubione',
+    userPanel: 'Panel użytkownika',
+    userPanelSub: 'Moje dane na potem',
     userProfile: 'Mój profil i dane dostawy',
     searchPlaceholder: 'Szukaj po nazwie, nr OEM (np. BRE, BOS), marce...',
     searchButton: 'Szukaj',
@@ -58,6 +60,9 @@ export default {
     emptyDesc: 'Spróbuj zmienić parametry wyszukiwania lub zresetować filtry.',
     resetFilters: 'Resetuj filtry',
     fitsTo: 'Pasuje m.in. do:',
+    userPanelBannerTitle: 'Panel Użytkownika – Dane do zamówień',
+    userPanelBannerDesc: 'Podaj raz swoje dane dostawy i numer telefonu na potem, aby błyskawicznie zamawiać części bez ponownego wpisywania adresu.',
+    userPanelBannerBtn: 'Otwórz Panel Użytkownika',
     addToCart: 'Do koszyka',
     searchButton: 'Szukaj',
     searchHeroPlaceholder: 'Wyszukaj część po nazwie, modelu auta lub numerze OEM...',
@@ -97,6 +102,8 @@ export default {
     applyCoupon: 'Zastosuj',
     couponAppliedSuccess: 'Kod rabatowy {code} został pomyślnie naliczony!',
     securityBadge: 'Płatność chroniona certyfikatem SSL & Mock Gateway',
+    userPanelPrompt: 'Zapisz dane w Panelu Użytkownika, aby zamawiać 1-klikiem.',
+    userPanelLink: 'Panel Użytkownika',
     emptyTitle: 'Twój koszyk jest pusty',
     emptyDesc: 'Nie dodałeś jeszcze żadnych części do swojego koszyka.',
     backToCatalog: 'Wróć do przeglądania części'
@@ -146,6 +153,7 @@ export default {
     dpdOption: 'Kurier DPD 24h (Doręczenie pod wskazany adres)',
     saveAddressCheckbox: 'Zapamiętaj ten adres i dane do przyszłych zamówień',
     savedAddressLoaded: 'Automatycznie uzupełniono z zapamiętanego profilu dostawy',
+    editInProfile: 'Panel Użytkownika',
     nameLabel: 'Imię i nazwisko',
     namePlaceholder: 'Jan Kowalski',
     nameRequired: 'Imię i nazwisko jest wymagane',
@@ -296,6 +304,7 @@ export default {
   profile: {
     title: 'Panel Użytkownika',
     subtitle: 'Zarządzaj swoimi domyślnymi danymi do zamówień i wysyłki na potem',
+    newBadge: 'Szybkie zamawianie',
     ordersStat: 'Historia zamówień',
     wishlistStat: 'Lista życzeń',
     returnsStat: 'Zgłoszone zwroty',
@@ -331,6 +340,13 @@ export default {
       filters: 'Filtry i Oleje silnikowe',
       engine: 'Rozrząd i Silnik',
       ignition: 'Układ Zapłonowy'
+    },
+    accountTitle: 'Strefa Klienta',
+    account: {
+      profile: 'Panel Użytkownika (Moje dane)',
+      orders: 'Historia Zamówień',
+      returns: 'Centrum Zwrotów',
+      wishlist: 'Lista Życzeń'
     },
     contactTitle: 'Kontakt i Pomoc',
     helpline: 'Infolinia: +48 22 123 45 67',

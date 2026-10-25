@@ -14,7 +14,8 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     isAuthenticated: (state) => !!state.token,
     isAdmin: (state) => state.user?.roles?.includes('admin') || state.user?.username === 'admin',
-    userName: (state) => state.user?.username || i18n.global.t('common.guest')
+    userName: (state) => state.user?.username || i18n.global.t('common.guest'),
+    hasSavedProfile: (state) => !!state.shippingProfile
   },
 
   actions: {

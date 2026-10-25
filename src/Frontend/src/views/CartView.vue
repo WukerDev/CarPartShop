@@ -183,6 +183,26 @@
             {{ $t('cart.proceedToCheckout') }}
           </v-btn>
 
+          <v-sheet
+            color="rgba(20, 184, 166, 0.08)"
+            class="pa-3 rounded-lg border mt-3 text-caption text-grey-lighten-1 d-flex align-center justify-space-between flex-wrap gap-2"
+            style="border-color: rgba(45, 212, 191, 0.25) !important;"
+          >
+            <div class="d-flex align-center">
+              <v-icon icon="mdi-card-account-details-outline" color="primary" class="mr-2" size="20"></v-icon>
+              <span>{{ $t('cart.userPanelPrompt') }}</span>
+            </div>
+            <v-btn
+              size="x-small"
+              variant="tonal"
+              color="primary"
+              to="/profile"
+              class="text-none font-weight-bold ml-auto"
+            >
+              {{ $t('cart.userPanelLink') }}
+            </v-btn>
+          </v-sheet>
+
           <div class="text-caption text-grey text-center mt-3 d-flex align-center justify-center">
             <v-icon icon="mdi-shield-check" color="success" size="14" class="mr-1"></v-icon>
             {{ $t('cart.securityBadge') }}

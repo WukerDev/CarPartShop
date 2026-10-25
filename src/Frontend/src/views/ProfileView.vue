@@ -1,15 +1,42 @@
 <template>
   <v-container class="py-6">
-    <div class="d-flex align-center justify-space-between mb-6">
+    <div class="d-flex align-center justify-space-between mb-6 flex-wrap gap-3">
       <div class="d-flex align-center">
         <v-btn icon="mdi-arrow-left" variant="text" to="/" class="mr-2"></v-btn>
         <div>
-          <h1 class="text-h5 font-weight-bold text-white d-flex align-center">
-            <v-icon icon="mdi-account-circle" color="primary" class="mr-2"></v-icon>
-            {{ $t('profile.title') }}
-          </h1>
-          <span class="text-caption text-grey">{{ $t('profile.subtitle') }}</span>
+          <div class="d-flex align-center flex-wrap">
+            <h1 class="text-h5 font-weight-bold text-white d-flex align-center mr-3">
+              <v-icon icon="mdi-card-account-details" color="primary" class="mr-2"></v-icon>
+              {{ $t('profile.title') }}
+            </h1>
+            <v-chip size="small" color="primary" variant="flat" class="font-weight-black">
+              {{ $t('profile.newBadge') }}
+            </v-chip>
+          </div>
+          <span class="text-caption text-grey-lighten-1">{{ $t('profile.subtitle') }}</span>
         </div>
+      </div>
+      <div class="d-flex align-center gap-2">
+        <v-btn
+          variant="tonal"
+          color="primary"
+          to="/"
+          prepend-icon="mdi-view-grid-outline"
+          class="text-none font-weight-bold rounded-lg"
+          size="small"
+        >
+          {{ $t('navbar.catalog') }}
+        </v-btn>
+        <v-btn
+          variant="tonal"
+          color="secondary"
+          to="/orders"
+          prepend-icon="mdi-history"
+          class="text-none font-weight-bold rounded-lg"
+          size="small"
+        >
+          {{ $t('navbar.orders') }}
+        </v-btn>
       </div>
     </div>
 

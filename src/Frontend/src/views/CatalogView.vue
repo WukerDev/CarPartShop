@@ -57,6 +57,48 @@
       </div>
     </v-sheet>
 
+    <v-sheet
+      color="surface"
+      class="user-panel-banner pa-4 pa-md-5 rounded-2xl mb-8 border"
+      elevation="2"
+    >
+      <div class="d-flex flex-column flex-sm-row align-start align-sm-center justify-space-between gap-3">
+        <div class="d-flex align-center">
+          <v-avatar color="primary" size="46" class="mr-3 elevation-2 flex-shrink-0">
+            <v-icon icon="mdi-card-account-details-outline" color="white" size="26"></v-icon>
+          </v-avatar>
+          <div>
+            <div class="text-subtitle-1 font-weight-bold text-white d-flex align-center flex-wrap">
+              <span>{{ $t('catalog.userPanelBannerTitle') }}</span>
+              <v-chip
+                size="x-small"
+                :color="authStore.hasSavedProfile ? 'success' : 'primary'"
+                variant="flat"
+                class="ml-2 font-weight-black my-1"
+              >
+                <v-icon :icon="authStore.hasSavedProfile ? 'mdi-check-decagram' : 'mdi-flash'" size="12" class="mr-1"></v-icon>
+                {{ authStore.hasSavedProfile ? $t('checkout.savedAddressLoaded') : $t('profile.newBadge') }}
+              </v-chip>
+            </div>
+            <div class="text-caption text-grey-lighten-1">
+              {{ $t('catalog.userPanelBannerDesc') }}
+            </div>
+          </div>
+        </div>
+
+        <v-btn
+          color="primary"
+          variant="flat"
+          to="/profile"
+          prepend-icon="mdi-account-cog"
+          rounded="lg"
+          class="text-none font-weight-bold px-5 align-self-stretch align-self-sm-auto flex-shrink-0"
+        >
+          {{ $t('catalog.userPanelBannerBtn') }}
+        </v-btn>
+      </div>
+    </v-sheet>
+
     <v-card
       color="surface"
       class="vehicle-selector-card pa-4 pa-md-6 rounded-2xl mb-8 border"
@@ -266,12 +308,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useAuthStore } from '@/stores/authStore';
 import { useCatalogStore } from '@/stores/catalogStore';
 import ProductCard from '@/components/ProductCard.vue';
 import ProductDetailModal from '@/components/ProductDetailModal.vue';
 import type { CarPart } from '@/types';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 const catalogStore = useCatalogStore();
 const detailsOpen = ref(false);
 const selectedPart = ref<CarPart | null>(null);
@@ -316,6 +360,11 @@ function resetFilters() {
 .hero-banner {
   background: linear-gradient(135deg, #0A1618 0%, #0F2528 50%, #0B191B 100%);
   border-color: rgba(45, 212, 191, 0.15) !important;
+}
+
+.user-panel-banner {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.12) 0%, #0B181A 100%) !important;
+  border-color: rgba(45, 212, 191, 0.3) !important;
 }
 
 .hero-search-box {
