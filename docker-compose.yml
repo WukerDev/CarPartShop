@@ -78,6 +78,8 @@ services:
       ReverseProxy__Clusters__frontend-cluster__Destinations__destination1__Address: "http://frontend:80"
     ports:
       - "5000:5000"
+      - "443:443"
+      - "80:80"
     depends_on:
       - backend
       - keycloak
