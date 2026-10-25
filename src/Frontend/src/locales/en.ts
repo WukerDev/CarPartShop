@@ -123,7 +123,8 @@ export default {
     commentLabel: 'Review comments / Fitment experience',
     submitBtn: 'Submit review',
     noReviewsYet: 'No reviews yet for this part. Be the first driver to review this item!',
-    success: 'Thank you! Your review has been successfully submitted.'
+    success: 'Thank you! Your review has been successfully submitted.',
+    reviewAddedSuccess: 'Thank you! Your review has been successfully submitted.'
   },
   checkout: {
     orderPlacedTitle: 'Order Placed Successfully!',
@@ -281,6 +282,8 @@ export default {
     subtitle: 'Integrated with Keycloak Authority & Gateway YARP (/identity)',
     adminAccount: 'Administrator Account',
     defaultBadge: 'Default',
+    loginPrefix: 'Login:',
+    passwordPrefix: 'Password:',
     credentialsNotice: 'Login: {login} | Password: {password}',
     quickLoginBtn: 'Login as admin (1-click)',
     usernameLabel: 'Username',
@@ -338,6 +341,7 @@ export default {
   notifications: {
     addedToCart: 'Added to cart: {name}',
     addedToCartQty: 'Added to cart: {name} ({quantity} pcs)',
+    addedToCartCount: 'Added to cart: {name} ({count} pcs)',
     orderSuccess: 'Order #{id} paid successfully. Transaction code: {txId}',
     returnSuccess: 'Return request was approved successfully!',
     returnError: 'Failed to submit return request.',
@@ -349,6 +353,7 @@ export default {
     orderPlaced: '[New Order #{orderId}]: {customerName} - {total} PLN'
   },
   errors: {
+    generalError: 'An unexpected error occurred. Please try again later.',
     invalidCredentials: 'Invalid username or password (default: admin / admin)',
     loginError: 'Login failed.',
     categoriesLoadError: 'Failed to load part categories',

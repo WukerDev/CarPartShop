@@ -123,7 +123,8 @@ export default {
     commentLabel: 'Komentarz / Wrażenia z montażu',
     submitBtn: 'Opublikuj opinię',
     noReviewsYet: 'Brak opinii dla tej części. Bądź pierwszym kierowcą, który oceni ten produkt!',
-    success: 'Dziękujemy! Twoja opinia została pomyślnie opublikowana.'
+    success: 'Dziękujemy! Twoja opinia została pomyślnie opublikowana.',
+    reviewAddedSuccess: 'Dziękujemy! Twoja opinia została pomyślnie opublikowana.'
   },
   checkout: {
     orderPlacedTitle: 'Zamówienie Zostało Złożone!',
@@ -281,6 +282,8 @@ export default {
     subtitle: 'Zintegrowane z Keycloak Authority & Gateway YARP (/identity)',
     adminAccount: 'Konto Administratora',
     defaultBadge: 'Domyślne',
+    loginPrefix: 'Login:',
+    passwordPrefix: 'Hasło:',
     credentialsNotice: 'Login: {login} | Hasło: {password}',
     quickLoginBtn: 'Zaloguj jako admin (1-klik)',
     usernameLabel: 'Nazwa użytkownika',
@@ -338,6 +341,7 @@ export default {
   notifications: {
     addedToCart: 'Dodano do koszyka: {name}',
     addedToCartQty: 'Dodano do koszyka: {name} ({quantity} szt.)',
+    addedToCartCount: 'Dodano do koszyka: {name} ({count} szt.)',
     orderSuccess: 'Zamówienie #{id} opłacone pomyślnie. Kod transakcji: {txId}',
     returnSuccess: 'Zwrot został pomyślnie zaakceptowany!',
     returnError: 'Nie udało się zrealizować zwrotu.',
@@ -349,6 +353,7 @@ export default {
     orderPlaced: '[Nowe Zamówienie #{orderId}]: {customerName} - {total} PLN'
   },
   errors: {
+    generalError: 'Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.',
     invalidCredentials: 'Nieprawidłowy login lub hasło (domyślne: admin / admin)',
     loginError: 'Wystąpił błąd logowania.',
     categoriesLoadError: 'Nie udało się pobrać kategorii części',

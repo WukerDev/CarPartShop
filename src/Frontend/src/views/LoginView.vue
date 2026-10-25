@@ -11,32 +11,6 @@
         </p>
       </div>
 
-      <v-sheet color="rgba(20, 184, 166, 0.1)" class="pa-4 rounded-xl border mb-6 text-left" style="border-color: rgba(20, 184, 166, 0.3) !important;">
-        <div class="d-flex align-center justify-space-between mb-2">
-          <div class="d-flex align-center">
-            <v-icon icon="mdi-account-star" color="primary" class="mr-2"></v-icon>
-            <span class="text-subtitle-2 font-weight-bold text-white">{{ $t('login.adminAccount') }}</span>
-          </div>
-          <v-chip size="x-small" color="primary" variant="flat">{{ $t('login.defaultBadge') }}</v-chip>
-        </div>
-        <p class="text-caption text-grey-lighten-1 mb-3">
-          {{ $t('login.loginPrefix') }} <strong class="text-white">admin</strong> | {{ $t('login.passwordPrefix') }} <strong class="text-white">admin</strong>
-        </p>
-        <v-btn
-          color="primary"
-          variant="flat"
-          block
-          size="small"
-          rounded="lg"
-          prepend-icon="mdi-flash"
-          class="text-none font-weight-bold"
-          :loading="authStore.loading"
-          @click="quickLoginAdmin"
-        >
-          {{ $t('login.quickLoginBtn') }}
-        </v-btn>
-      </v-sheet>
-
       <v-form @submit.prevent="onLogin">
         <v-text-field
           v-model="username"
@@ -100,14 +74,8 @@ const { t } = useI18n();
 const authStore = useAuthStore();
 const signalrStore = useSignalRStore();
 
-const username = ref('admin');
-const password = ref('admin');
-
-async function quickLoginAdmin() {
-  username.value = 'admin';
-  password.value = 'admin';
-  await onLogin();
-}
+const username = ref('');
+const password = ref('');
 
 async function onLogin() {
   const success = await authStore.login(username.value, password.value);

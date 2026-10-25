@@ -71,62 +71,6 @@ body {
     margin-top: 4px;
 }
 
-.quick-admin-box {
-    background: rgba(20, 184, 166, 0.08);
-    border: 1px solid rgba(20, 184, 166, 0.3);
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 22px;
-}
-
-.quick-admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-}
-
-.quick-admin-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #5EEAD4;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.badge {
-    font-size: 11px;
-    font-weight: 600;
-    background: #14B8A6;
-    color: #042F2E;
-    padding: 2px 8px;
-    border-radius: 6px;
-}
-
-.quick-admin-text {
-    font-size: 12px;
-    color: #CBD5E1;
-    margin-bottom: 10px;
-}
-
-.btn-quick {
-    width: 100%;
-    background: #14B8A6;
-    color: #042F2E;
-    border: none;
-    border-radius: 8px;
-    padding: 7px 12px;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.btn-quick:hover {
-    background: #2DD4BF;
-}
-
 .form-group {
     margin-bottom: 18px;
 }

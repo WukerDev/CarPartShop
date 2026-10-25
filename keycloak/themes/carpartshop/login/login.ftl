@@ -28,15 +28,6 @@
                 </div>
             </#if>
 
-            <div class="quick-admin-box">
-                <div class="quick-admin-header">
-                    <span class="quick-admin-title"><i class="mdi mdi-account-star"></i> Konto administratora</span>
-                    <span class="badge">Domyślne</span>
-                </div>
-                <p class="quick-admin-text">Login: <strong>admin</strong> | Hasło: <strong>admin</strong></p>
-                <button type="button" class="btn-quick" onclick="fillAdmin()">Wypełnij dane administratora</button>
-            </div>
-
             <form id="kc-form-login" class="login-form" action="${url.loginAction}" method="post">
                 <div class="form-group">
                     <label for="username">Nazwa użytkownika lub email</label>
@@ -64,12 +55,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function fillAdmin() {
-            document.getElementById('username').value = 'admin';
-            document.getElementById('password').value = 'admin';
-        }
-    </script>
 </body>
 </html>
