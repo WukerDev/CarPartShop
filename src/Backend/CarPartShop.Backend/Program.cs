@@ -121,8 +121,8 @@ else
     }
 }
 
-app.UseCors("CorsPolicy");
 app.UseRouting();
+app.UseCors("CorsPolicy");
 
 app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
 

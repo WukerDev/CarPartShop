@@ -34,7 +34,6 @@ var app = builder.Build();
 app.UseCors("GatewayCors");
 
 app.MapGet("/", () => Results.Redirect("/portal/"));
-app.MapGet("/portal", () => Results.Redirect("/portal/"));
 
 app.MapReverseProxy();
 
