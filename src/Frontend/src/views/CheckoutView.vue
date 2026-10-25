@@ -29,6 +29,16 @@
           <span class="text-caption text-grey">{{ $t('checkout.recipient') }}</span>
           <span class="text-body-2 font-weight-bold text-white">{{ form.customerName }}</span>
         </div>
+        <div class="d-flex justify-space-between mb-2">
+          <span class="text-caption text-grey">{{ $t('checkout.courierName') }}</span>
+          <span class="text-body-2 text-white font-weight-bold">{{ completedCourierName }}</span>
+        </div>
+        <div v-if="completedTrackingNumber" class="d-flex justify-space-between mb-2">
+          <span class="text-caption text-grey">{{ $t('checkout.trackingNumber') }}</span>
+          <v-chip size="x-small" color="primary" variant="tonal" class="font-weight-black">
+            {{ completedTrackingNumber }}
+          </v-chip>
+        </div>
         <div class="d-flex justify-space-between">
           <span class="text-caption text-grey">{{ $t('checkout.shippingAddress') }}</span>
           <span class="text-body-2 text-white">{{ form.shippingAddress }}</span>
@@ -70,10 +80,16 @@
       <v-row>
         <v-col cols="12" md="7">
           <v-card color="surface" class="rounded-2xl pa-6 mb-6" border>
-            <h2 class="text-subtitle-1 font-weight-bold text-white mb-4 d-flex align-center">
-              <v-icon icon="mdi-truck-delivery" color="primary" class="mr-2"></v-icon>
-              {{ $t('checkout.deliveryDetails') }}
-            </h2>
+            <div class="d-flex align-center justify-space-between mb-4">
+              <h2 class="text-subtitle-1 font-weight-bold text-white d-flex align-center mb-0">
+                <v-icon icon="mdi-account-outline" color="primary" class="mr-2"></v-icon>
+                {{ $t('checkout.deliveryDetails') }}
+              </h2>
+              <v-chip v-if="hasSavedProfile" size="x-small" color="primary" variant="tonal" class="font-weight-bold">
+                <v-icon icon="mdi-check-decagram" size="12" class="mr-1"></v-icon>
+                {{ $t('checkout.savedAddressLoaded') }}
+              </v-chip>
+            </div>
 
             <v-form ref="formRef" @submit.prevent="proceedToPayment">
               <v-text-field
@@ -117,9 +133,36 @@
                 :placeholder="$t('checkout.addressPlaceholder')"
                 variant="outlined"
                 density="compact"
-                class="mb-4"
+                class="mb-3"
                 :rules="[v => !!v || t('checkout.addressRequired')]"
               ></v-text-field>
+
+              <h2 class="text-subtitle-1 font-weight-bold text-white mb-2 d-flex align-center">
+                <v-icon icon="mdi-truck-delivery" color="primary" class="mr-2"></v-icon>
+                {{ $t('checkout.shippingMethodTitle') }}
+              </h2>
+
+              <v-radio-group v-model="form.courierName" class="mb-2">
+                <v-radio
+                  value="InPost Paczkomaty 24/7"
+                  :label="$t('checkout.inpostOption')"
+                  color="primary"
+                ></v-radio>
+                <v-radio
+                  value="Kurier DPD 24h"
+                  :label="$t('checkout.dpdOption')"
+                  color="primary"
+                ></v-radio>
+              </v-radio-group>
+
+              <v-checkbox
+                v-model="saveProfile"
+                :label="$t('checkout.saveAddressCheckbox')"
+                color="primary"
+                density="compact"
+                hide-details
+                class="mb-4"
+              ></v-checkbox>
 
               <h2 class="text-subtitle-1 font-weight-bold text-white mb-3 d-flex align-center">
                 <v-icon icon="mdi-cash" color="secondary" class="mr-2"></v-icon>
@@ -181,6 +224,11 @@
             <div class="d-flex justify-space-between text-body-2 text-grey mb-1">
               <span>{{ $t('checkout.orderValue') }}</span>
               <span class="text-white font-weight-bold">{{ cartStore.totalPrice.toFixed(2) }} {{ $t('common.currency') }}</span>
+            </div>
+
+            <div v-if="cartStore.discountAmount > 0" class="d-flex justify-space-between text-body-2 text-success font-weight-bold mb-1">
+              <span>{{ $t('checkout.discountAmount') }} ({{ cartStore.couponCode }})</span>
+              <span>-{{ cartStore.discountAmount.toFixed(2) }} {{ $t('common.currency') }}</span>
             </div>
 
             <div class="d-flex justify-space-between text-body-2 text-grey mb-3">
@@ -249,12 +297,18 @@ const paymentModalOpen = ref(false);
 const pendingOrderId = ref(0);
 const orderCompleted = ref(false);
 const completedOrderId = ref(0);
+const completedCourierName = ref('');
+const completedTrackingNumber = ref('');
+const saveProfile = ref(true);
+
+const hasSavedProfile = !!authStore.shippingProfile;
 
 const form = reactive({
-  customerName: authStore.user?.username === 'admin' ? t('checkout.defaultAdminName') : t('checkout.defaultCustomerName'),
-  email: authStore.user?.email || 'admin@carpartshop.local',
-  phone: '+48 500 600 700',
-  shippingAddress: t('checkout.defaultAddress'),
+  customerName: authStore.shippingProfile?.customerName || (authStore.user?.username === 'admin' ? t('checkout.defaultAdminName') : t('checkout.defaultCustomerName')),
+  email: authStore.shippingProfile?.email || authStore.user?.email || 'admin@carpartshop.local',
+  phone: authStore.shippingProfile?.phone || '+48 500 600 700',
+  shippingAddress: authStore.shippingProfile?.shippingAddress || t('checkout.defaultAddress'),
+  courierName: authStore.shippingProfile?.courierName || 'InPost Paczkomaty 24/7',
   paymentMethod: 'Card'
 });
 
@@ -276,10 +330,24 @@ async function onPaymentApproved(txId: string) {
       email: form.email,
       phone: form.phone,
       shippingAddress: form.shippingAddress,
-      paymentMethod: form.paymentMethod
+      paymentMethod: form.paymentMethod,
+      courierName: form.courierName,
+      discountCode: cartStore.couponCode || undefined
     });
 
+    if (saveProfile.value) {
+      authStore.saveShippingProfile({
+        customerName: form.customerName,
+        email: form.email,
+        phone: form.phone,
+        shippingAddress: form.shippingAddress,
+        courierName: form.courierName
+      });
+    }
+
     completedOrderId.value = order.id;
+    completedCourierName.value = order.courierName || form.courierName;
+    completedTrackingNumber.value = order.trackingNumber || '';
     orderCompleted.value = true;
     signalrStore.addNotification('success', t('notifications.orderSuccess', { id: order.id, txId }));
   } catch (err: any) {

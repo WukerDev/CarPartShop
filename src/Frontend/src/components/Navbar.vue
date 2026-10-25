@@ -40,6 +40,14 @@
         >
           {{ $t('navbar.returns') }}
         </v-btn>
+        <v-btn
+          variant="text"
+          prepend-icon="mdi-heart-outline"
+          to="/wishlist"
+          class="text-none"
+        >
+          {{ $t('navbar.wishlist') }}
+        </v-btn>
       </div>
 
       <v-spacer></v-spacer>
@@ -123,6 +131,23 @@
       <v-btn
         icon
         variant="text"
+        to="/wishlist"
+        class="mr-1"
+        :title="$t('navbar.wishlist')"
+      >
+        <v-badge
+          :content="wishlistStore.count"
+          :model-value="wishlistStore.count > 0"
+          color="pink-darken-1"
+          overlap
+        >
+          <v-icon icon="mdi-heart-outline"></v-icon>
+        </v-badge>
+      </v-btn>
+
+      <v-btn
+        icon
+        variant="text"
         to="/cart"
         class="mr-2"
       >
@@ -161,17 +186,17 @@
               </v-list-item-subtitle>
             </v-list-item>
             <v-divider class="my-1"></v-divider>
+            <v-list-item to="/profile" prepend-icon="mdi-account-cog">
+              <v-list-item-title>{{ $t('navbar.userProfile') }}</v-list-item-title>
+            </v-list-item>
             <v-list-item to="/orders" prepend-icon="mdi-package-variant">
               <v-list-item-title>{{ $t('navbar.orderHistory') }}</v-list-item-title>
             </v-list-item>
             <v-list-item to="/returns" prepend-icon="mdi-keyboard-return">
               <v-list-item-title>{{ $t('navbar.reportedReturns') }}</v-list-item-title>
             </v-list-item>
-            <v-list-item prepend-icon="mdi-database-refresh" @click="confirmSeedOpen = true">
-              <v-list-item-title class="text-teal-accent-3">{{ $t('navbar.seedDatabase') }}</v-list-item-title>
-            </v-list-item>
             <v-divider class="my-1"></v-divider>
-            <v-list-item prepend-icon="mdi-logout" @click="authStore.logout()">
+            <v-list-item prepend-icon="mdi-logout" @click="handleLogout">
               <v-list-item-title class="text-error">{{ $t('navbar.logout') }}</v-list-item-title>
             </v-list-item>
           </v-list>
@@ -179,17 +204,6 @@
       </template>
 
       <template v-else>
-        <v-btn
-          variant="text"
-          size="small"
-          color="secondary"
-          class="mr-2 text-none d-none d-sm-flex"
-          prepend-icon="mdi-database-refresh"
-          @click="confirmSeedOpen = true"
-        >
-          {{ $t('navbar.seedDatabase') }}
-        </v-btn>
-
         <v-btn
           color="primary"
           variant="flat"
@@ -202,54 +216,24 @@
         </v-btn>
       </template>
     </v-container>
-
-    <v-dialog v-model="confirmSeedOpen" max-width="480">
-      <v-card color="#14272A" class="rounded-xl border pa-2">
-        <v-card-title class="d-flex align-center text-white">
-          <v-icon icon="mdi-database-refresh" color="primary" class="mr-2"></v-icon>
-          <span>{{ $t('navbar.seedDatabase') }}</span>
-        </v-card-title>
-        <v-card-text class="text-grey-lighten-2">
-          {{ $t('navbar.seedConfirm') }}
-        </v-card-text>
-        <v-card-actions class="d-flex justify-end gap-2 px-4 pb-3">
-          <v-btn variant="text" :disabled="seeding" @click="confirmSeedOpen = false">
-            {{ $t('common.cancel') }}
-          </v-btn>
-          <v-btn
-            color="primary"
-            variant="flat"
-            :loading="seeding"
-            rounded="lg"
-            @click="handleSeedDatabase"
-          >
-            {{ $t('common.confirm') }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-app-bar>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import { useCatalogStore } from '@/stores/catalogStore';
-import { useSignalRStore } from '@/stores/signalrStore';
-import { api } from '@/services/api';
+import { useWishlistStore } from '@/stores/wishlistStore';
 
 const router = useRouter();
 const authStore = useAuthStore();
 const cartStore = useCartStore();
 const catalogStore = useCatalogStore();
-const signalrStore = useSignalRStore();
-const { locale, t } = useI18n();
-
-const confirmSeedOpen = ref(false);
-const seeding = ref(false);
+const wishlistStore = useWishlistStore();
+const { locale } = useI18n();
 
 const currentLocale = computed(() => locale.value);
 const currentLocaleLabel = computed(() => locale.value === 'pl' ? 'PL' : 'EN');
@@ -265,19 +249,9 @@ function onSearch() {
   }
 }
 
-async function handleSeedDatabase() {
-  seeding.value = true;
-  try {
-    const res = await api.seedDatabase(true);
-    confirmSeedOpen.value = false;
-    await catalogStore.fetchCategories();
-    await catalogStore.fetchParts();
-    signalrStore.addNotification('success', res.message || t('navbar.seedSuccess'));
-  } catch (err: any) {
-    signalrStore.addNotification('error', err.message || t('errors.generalError'));
-  } finally {
-    seeding.value = false;
-  }
+function handleLogout() {
+  authStore.logout();
+  router.push('/login');
 }
 </script>
 

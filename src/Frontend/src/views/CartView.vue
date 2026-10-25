@@ -117,7 +117,53 @@
             </span>
           </div>
 
+          <div v-if="cartStore.discountAmount > 0" class="d-flex justify-space-between text-body-2 text-success font-weight-bold mb-2">
+            <span>{{ $t('cart.discountLabel') }} ({{ cartStore.couponCode }})</span>
+            <span>-{{ cartStore.discountAmount.toFixed(2) }} {{ $t('common.currency') }}</span>
+          </div>
+
           <v-divider class="my-4"></v-divider>
+
+          <div class="mb-4">
+            <div v-if="cartStore.couponCode" class="d-flex align-center justify-space-between pa-3 rounded-xl border bg-surface-variant mb-2" style="border-color: rgba(20, 184, 166, 0.4) !important;">
+              <div>
+                <div class="d-flex align-center">
+                  <v-icon icon="mdi-ticket-percent" color="primary" class="mr-2"></v-icon>
+                  <span class="text-subtitle-2 font-weight-bold text-white">{{ cartStore.couponCode }}</span>
+                </div>
+                <div class="text-caption text-primary">{{ cartStore.couponDescription }}</div>
+              </div>
+              <div class="d-flex align-center">
+                <span class="text-subtitle-2 font-weight-bold text-success mr-2">-{{ cartStore.discountAmount.toFixed(2) }} {{ $t('common.currency') }}</span>
+                <v-btn icon="mdi-close" size="x-small" variant="text" color="grey" @click="cartStore.removeCoupon()"></v-btn>
+              </div>
+            </div>
+
+            <div v-else class="d-flex align-center gap-2 mb-1">
+              <v-text-field
+                v-model="couponInput"
+                :placeholder="$t('cart.couponPlaceholder')"
+                density="compact"
+                variant="outlined"
+                hide-details
+                rounded="lg"
+                prepend-inner-icon="mdi-ticket-outline"
+                @keyup.enter="handleApplyCoupon"
+              ></v-text-field>
+              <v-btn
+                color="secondary"
+                variant="flat"
+                :loading="applyingCoupon"
+                :disabled="!couponInput.trim()"
+                rounded="lg"
+                class="text-none font-weight-bold"
+                @click="handleApplyCoupon"
+              >
+                {{ $t('cart.applyCoupon') }}
+              </v-btn>
+            </div>
+            <div v-if="couponError" class="text-caption text-error mb-2">{{ couponError }}</div>
+          </div>
 
           <div class="d-flex justify-space-between align-center mb-6">
             <span class="text-subtitle-1 font-weight-bold text-white">{{ $t('cart.totalToPay') }}</span>
@@ -161,7 +207,41 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useCartStore } from '@/stores/cartStore';
+import { useSignalRStore } from '@/stores/signalrStore';
 
+const { t } = useI18n();
 const cartStore = useCartStore();
+const signalrStore = useSignalRStore();
+
+const couponInput = ref('');
+const applyingCoupon = ref(false);
+const couponError = ref('');
+
+async function handleApplyCoupon() {
+  if (!couponInput.value.trim()) return;
+  applyingCoupon.value = true;
+  couponError.value = '';
+  try {
+    const success = await cartStore.applyCoupon(couponInput.value.trim());
+    if (success) {
+      signalrStore.addNotification('success', t('cart.couponAppliedSuccess', { code: cartStore.couponCode }));
+      couponInput.value = '';
+    } else {
+      couponError.value = t('errors.invalidCoupon');
+    }
+  } catch (err: any) {
+    couponError.value = err.message || t('errors.invalidCoupon');
+  } finally {
+    applyingCoupon.value = false;
+  }
+}
 </script>
+
+<style scoped>
+.gap-2 {
+  gap: 8px;
+}
+</style>

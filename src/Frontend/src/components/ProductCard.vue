@@ -4,6 +4,10 @@
     color="surface"
     elevation="4"
     border
+    role="button"
+    tabindex="0"
+    @click="$emit('view-details', part)"
+    @keydown.enter="$emit('view-details', part)"
   >
     <div class="product-image-container position-relative overflow-hidden w-100">
       <v-img
@@ -100,11 +104,11 @@
         <v-btn
           icon
           size="small"
-          variant="tonal"
-          color="grey-lighten-1"
-          @click="$emit('view-details', part)"
+          :variant="isWishlisted ? 'flat' : 'tonal'"
+          :color="isWishlisted ? 'error' : 'grey-lighten-1'"
+          @click.stop="toggleWishlist"
         >
-          <v-icon icon="mdi-eye-outline"></v-icon>
+          <v-icon :icon="isWishlisted ? 'mdi-heart' : 'mdi-heart-outline'"></v-icon>
         </v-btn>
 
         <v-btn
@@ -114,7 +118,7 @@
           :disabled="part.stockQuantity <= 0"
           class="text-none font-weight-bold"
           rounded="lg"
-          @click="addToCart"
+          @click.stop="addToCart"
         >
           {{ $t('catalog.addToCart') }}
         </v-btn>
@@ -130,6 +134,7 @@ import type { CarPart } from '@/types';
 import { useCartStore } from '@/stores/cartStore';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { useSignalRStore } from '@/stores/signalrStore';
+import { useWishlistStore } from '@/stores/wishlistStore';
 
 const props = defineProps<{
   part: CarPart;
@@ -143,6 +148,19 @@ const { t } = useI18n();
 const cartStore = useCartStore();
 const catalogStore = useCatalogStore();
 const signalrStore = useSignalRStore();
+const wishlistStore = useWishlistStore();
+
+const isWishlisted = computed(() => wishlistStore.hasItem(props.part.id));
+
+function toggleWishlist() {
+  const added = wishlistStore.toggle(props.part);
+  signalrStore.addNotification(
+    'info',
+    added
+      ? t('wishlist.addedToast', { name: props.part.name })
+      : t('wishlist.removedToast', { name: props.part.name })
+  );
+}
 
 const isVehicleMatch = computed(() => {
   if (!catalogStore.selectedMake) return false;
@@ -168,6 +186,7 @@ function addToCart() {
 .product-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   border-color: rgba(45, 212, 191, 0.12) !important;
+  cursor: pointer;
 }
 
 .product-card:hover {

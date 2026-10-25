@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
-import type { User } from '@/types';
+import type { User, ShippingProfile } from '@/types';
 import i18n from '@/plugins/i18n';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: (JSON.parse(localStorage.getItem('carpart_user') || 'null') as User | null),
     token: localStorage.getItem('carpart_token') as string | null,
+    shippingProfile: (JSON.parse(localStorage.getItem('carpart_shipping_profile') || 'null') as ShippingProfile | null),
     loading: false,
     error: null as string | null
   }),
@@ -85,6 +86,16 @@ export const useAuthStore = defineStore('auth', {
         this.loading = false;
         return false;
       }
+    },
+
+    saveShippingProfile(profile: ShippingProfile) {
+      this.shippingProfile = profile;
+      localStorage.setItem('carpart_shipping_profile', JSON.stringify(profile));
+    },
+
+    clearShippingProfile() {
+      this.shippingProfile = null;
+      localStorage.removeItem('carpart_shipping_profile');
     },
 
     logout() {

@@ -15,6 +15,7 @@ public class ShopDbContext : DbContext
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<ReturnRequest> ReturnRequests => Set<ReturnRequest>();
     public DbSet<VehicleModel> Vehicles => Set<VehicleModel>();
+    public DbSet<ProductReview> ProductReviews => Set<ProductReview>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,9 +46,14 @@ public class ShopDbContext : DbContext
         {
             entity.HasKey(o => o.Id);
             entity.Property(o => o.TotalPrice).HasPrecision(18, 2);
+            entity.Property(o => o.DiscountAmount).HasPrecision(18, 2);
             entity.Property(o => o.Status).HasMaxLength(50);
             entity.Property(o => o.PaymentMethod).HasMaxLength(50);
             entity.Property(o => o.ReturnStatus).HasMaxLength(50);
+            entity.Property(o => o.TrackingNumber).HasMaxLength(100);
+            entity.Property(o => o.CourierName).HasMaxLength(100);
+            entity.Property(o => o.DiscountCode).HasMaxLength(50);
+            entity.Property(o => o.InvoiceNumber).HasMaxLength(100);
             entity.HasMany(o => o.Items)
                   .WithOne(i => i.Order)
                   .HasForeignKey(i => i.OrderId)
@@ -82,6 +88,17 @@ public class ShopDbContext : DbContext
             entity.Property(v => v.Make).IsRequired().HasMaxLength(100);
             entity.Property(v => v.Model).IsRequired().HasMaxLength(100);
             entity.HasIndex(v => new { v.Make, v.Model });
+        });
+
+        modelBuilder.Entity<ProductReview>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.AuthorName).IsRequired().HasMaxLength(100);
+            entity.Property(r => r.Comment).IsRequired().HasMaxLength(1000);
+            entity.HasOne(r => r.CarPart)
+                  .WithMany(p => p.Reviews)
+                  .HasForeignKey(r => r.CarPartId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

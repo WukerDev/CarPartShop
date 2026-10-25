@@ -11,7 +11,7 @@
         </p>
       </div>
 
-      <v-sheet color="rgba(225, 29, 72, 0.1)" class="pa-4 rounded-xl border mb-6 text-left" style="border-color: rgba(225, 29, 72, 0.3) !important;">
+      <v-sheet color="rgba(20, 184, 166, 0.1)" class="pa-4 rounded-xl border mb-6 text-left" style="border-color: rgba(20, 184, 166, 0.3) !important;">
         <div class="d-flex align-center justify-space-between mb-2">
           <div class="d-flex align-center">
             <v-icon icon="mdi-account-star" color="primary" class="mr-2"></v-icon>
@@ -89,12 +89,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/authStore';
 import { useSignalRStore } from '@/stores/signalrStore';
 
 const router = useRouter();
+const route = useRoute();
 const { t } = useI18n();
 const authStore = useAuthStore();
 const signalrStore = useSignalRStore();
@@ -112,7 +113,8 @@ async function onLogin() {
   const success = await authStore.login(username.value, password.value);
   if (success) {
     signalrStore.addNotification('success', t('notifications.loginSuccess', { name: authStore.userName }));
-    router.push('/');
+    const redirectPath = (route.query.redirect as string) || '/';
+    router.push(redirectPath);
   }
 }
 </script>

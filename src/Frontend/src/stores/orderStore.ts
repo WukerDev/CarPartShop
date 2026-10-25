@@ -31,6 +31,8 @@ export const useOrderStore = defineStore('orders', {
       phone: string;
       shippingAddress: string;
       paymentMethod: string;
+      courierName?: string;
+      discountCode?: string;
     }): Promise<Order> {
       const cartStore = useCartStore();
       this.loading = true;
@@ -44,11 +46,13 @@ export const useOrderStore = defineStore('orders', {
 
         const newOrder = await api.createOrder({
           ...customerInfo,
+          discountCode: customerInfo.discountCode || (cartStore.couponCode || undefined),
           items
         });
 
         this.lastCreatedOrder = newOrder;
         this.orders.unshift(newOrder);
+        cartStore.removeCoupon();
         cartStore.clearCart();
         return newOrder;
       } catch (err: any) {

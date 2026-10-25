@@ -26,9 +26,9 @@ public class DbInitializerTests
         var stats = await DbInitializer.GetStatsAsync(db);
 
         stats.categories.Should().Be(8);
-        stats.parts.Should().Be(25);
-        stats.orders.Should().Be(4);
-        stats.returns.Should().Be(1);
+        stats.parts.Should().Be(40);
+        stats.orders.Should().Be(0);
+        stats.returns.Should().Be(0);
     }
 
     [Fact]
@@ -42,9 +42,9 @@ public class DbInitializerTests
         var stats = await DbInitializer.GetStatsAsync(db);
 
         stats.categories.Should().Be(8);
-        stats.parts.Should().Be(25);
-        stats.orders.Should().Be(4);
-        stats.returns.Should().Be(1);
+        stats.parts.Should().Be(40);
+        stats.orders.Should().Be(0);
+        stats.returns.Should().Be(0);
     }
 
     [Fact]
@@ -58,8 +58,8 @@ public class DbInitializerTests
         var stats = await DbInitializer.GetStatsAsync(db);
 
         stats.categories.Should().Be(8);
-        stats.parts.Should().Be(25);
-        stats.orders.Should().Be(4);
-        stats.returns.Should().Be(1);
+        stats.parts.Should().Be(40);
+        stats.orders.Should().Be(0);
+        stats.returns.Should().Be(0);
     }
 }

@@ -146,4 +146,70 @@ public class CatalogController : ControllerBase
             part.Rating
         });
     }
+
+    [HttpGet("parts/{id:int}/reviews")]
+    public async Task<IActionResult> GetPartReviews(int id)
+    {
+        var reviews = await _dbContext.ProductReviews
+            .Where(r => r.CarPartId == id)
+            .OrderByDescending(r => r.CreatedAt)
+            .Select(r => new
+            {
+                r.Id,
+                r.CarPartId,
+                r.AuthorName,
+                r.Rating,
+                r.Comment,
+                r.CreatedAt
+            })
+            .ToListAsync();
+
+        return Ok(reviews);
+    }
+
+    [HttpPost("parts/{id:int}/reviews")]
+    public async Task<IActionResult> AddPartReview(int id, [FromBody] AddReviewRequest request)
+    {
+        var part = await _dbContext.CarParts.Include(p => p.Reviews).FirstOrDefaultAsync(p => p.Id == id);
+        if (part == null)
+        {
+            return NotFound(new { message = $"Część o ID {id} nie została znaleziona." });
+        }
+
+        if (string.IsNullOrWhiteSpace(request.AuthorName) || string.IsNullOrWhiteSpace(request.Comment))
+        {
+            return BadRequest(new { message = "Imię autora oraz treść opinii są wymagane." });
+        }
+
+        var rating = Math.Clamp(request.Rating, 1, 5);
+
+        var review = new ProductReview
+        {
+            CarPartId = id,
+            AuthorName = request.AuthorName.Trim(),
+            Rating = rating,
+            Comment = request.Comment.Trim(),
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _dbContext.ProductReviews.Add(review);
+        await _dbContext.SaveChangesAsync();
+
+        var allRatings = await _dbContext.ProductReviews.Where(r => r.CarPartId == id).Select(r => r.Rating).ToListAsync();
+        part.Rating = Math.Round(allRatings.Average(), 1);
+        await _dbContext.SaveChangesAsync();
+
+        return Ok(new
+        {
+            review.Id,
+            review.CarPartId,
+            review.AuthorName,
+            review.Rating,
+            review.Comment,
+            review.CreatedAt,
+            updatedPartRating = part.Rating
+        });
+    }
 }
+
+public record AddReviewRequest(string AuthorName, int Rating, string Comment);

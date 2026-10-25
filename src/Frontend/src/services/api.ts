@@ -1,4 +1,4 @@
-import type { Category, CarPart, Order, ReturnRequestPayload, PaymentPayload } from '@/types';
+import type { Category, CarPart, Order, ReturnRequestPayload, PaymentPayload, ProductReview, CouponValidationResult, InvoiceData } from '@/types';
 import i18n from '@/plugins/i18n';
 
 class ApiService {
@@ -92,6 +92,8 @@ class ApiService {
     phone: string;
     shippingAddress: string;
     paymentMethod: string;
+    courierName?: string;
+    discountCode?: string;
     items: { partId: number; quantity: number }[];
   }): Promise<Order> {
     const res = await fetch(`${this.getBaseUrl()}/api/orders`, {
@@ -171,6 +173,48 @@ class ApiService {
       headers: this.getHeaders()
     });
     if (!res.ok) throw new Error(i18n.global.t('errors.seedStatusError'));
+    return await res.json();
+  }
+
+  async getPartReviews(partId: number): Promise<ProductReview[]> {
+    const res = await fetch(`${this.getBaseUrl()}/api/catalog/parts/${partId}/reviews`, {
+      headers: this.getHeaders()
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  }
+
+  async addPartReview(partId: number, authorName: string, rating: number, comment: string): Promise<any> {
+    const res = await fetch(`${this.getBaseUrl()}/api/catalog/parts/${partId}/reviews`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ authorName, rating, comment })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: i18n.global.t('errors.reviewAddError') }));
+      throw new Error(err.message || i18n.global.t('errors.reviewAddError'));
+    }
+    return await res.json();
+  }
+
+  async validateCoupon(code: string, amount: number): Promise<CouponValidationResult> {
+    const res = await fetch(`${this.getBaseUrl()}/api/orders/coupons/validate`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ code, amount })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: i18n.global.t('errors.invalidCoupon') }));
+      throw new Error(err.message || i18n.global.t('errors.invalidCoupon'));
+    }
+    return await res.json();
+  }
+
+  async getOrderInvoice(orderId: number): Promise<InvoiceData> {
+    const res = await fetch(`${this.getBaseUrl()}/api/orders/${orderId}/invoice`, {
+      headers: this.getHeaders()
+    });
+    if (!res.ok) throw new Error(i18n.global.t('errors.invoiceFetchError'));
     return await res.json();
   }
 }

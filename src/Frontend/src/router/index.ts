@@ -4,6 +4,8 @@ import CartView from '@/views/CartView.vue';
 import CheckoutView from '@/views/CheckoutView.vue';
 import OrdersView from '@/views/OrdersView.vue';
 import ReturnsView from '@/views/ReturnsView.vue';
+import WishlistView from '@/views/WishlistView.vue';
+import ProfileView from '@/views/ProfileView.vue';
 import LoginView from '@/views/LoginView.vue';
 
 const router = createRouter({
@@ -35,6 +37,16 @@ const router = createRouter({
       component: ReturnsView
     },
     {
+      path: '/wishlist',
+      name: 'wishlist',
+      component: WishlistView
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ProfileView
+    },
+    {
       path: '/login',
       name: 'login',
       component: LoginView
@@ -42,6 +54,17 @@ const router = createRouter({
   ],
   scrollBehavior() {
     return { top: 0 };
+  }
+});
+
+router.beforeEach((to, _from, next) => {
+  const token = localStorage.getItem('carpart_token');
+  if (to.name !== 'login' && !token) {
+    next({ name: 'login', query: { redirect: to.fullPath } });
+  } else if (to.name === 'login' && token) {
+    next({ name: 'catalog' });
+  } else {
+    next();
   }
 });
 

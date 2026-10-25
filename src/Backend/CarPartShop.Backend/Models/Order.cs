@@ -14,6 +14,11 @@ public class Order
     public string ReturnStatus { get; set; } = "None";
     public string? ReturnReason { get; set; }
     public string? ReturnComments { get; set; }
+    public string? TrackingNumber { get; set; }
+    public string? CourierName { get; set; }
+    public string? DiscountCode { get; set; }
+    public decimal DiscountAmount { get; set; }
+    public string? InvoiceNumber { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();

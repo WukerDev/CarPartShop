@@ -32,9 +32,12 @@ public class OrdersController : ControllerBase
         string Phone,
         string ShippingAddress,
         string PaymentMethod,
+        string? CourierName,
+        string? DiscountCode,
         List<CreateOrderItemDto> Items);
 
     public record ReturnRequestDto(int OrderId, string Reason, string Comments);
+    public record ValidateCouponDto(string Code, decimal Amount);
 
     [HttpGet]
     public async Task<IActionResult> GetOrders([FromQuery] string? userId, [FromQuery] string? email)
@@ -127,6 +130,36 @@ public class OrdersController : ControllerBase
             await _hubContext.Clients.All.SendAsync("ReceiveStockUpdate", part.Id, part.StockQuantity);
         }
 
+        decimal discountAmount = 0;
+        var discountCode = dto.DiscountCode?.Trim().ToUpperInvariant();
+        if (!string.IsNullOrEmpty(discountCode))
+        {
+            switch (discountCode)
+            {
+                case "START10":
+                    discountAmount = Math.Round(totalPrice * 0.10m, 2);
+                    break;
+                case "MOTO20":
+                    discountAmount = Math.Min(totalPrice, 20.00m);
+                    break;
+                case "WIOSNA15":
+                    discountAmount = Math.Round(totalPrice * 0.15m, 2);
+                    break;
+                case "VIP25":
+                    discountAmount = Math.Round(totalPrice * 0.25m, 2);
+                    break;
+            }
+        }
+
+        var finalPrice = Math.Max(0, totalPrice - discountAmount);
+        var courier = string.IsNullOrWhiteSpace(dto.CourierName)
+            ? (dto.ShippingAddress.Contains("Paczkomat", StringComparison.OrdinalIgnoreCase) ? "InPost Paczkomaty" : "Kurier DPD")
+            : dto.CourierName;
+
+        var isPaczkomat = courier.Contains("InPost", StringComparison.OrdinalIgnoreCase) || courier.Contains("Paczkomat", StringComparison.OrdinalIgnoreCase);
+        var trackingPrefix = isPaczkomat ? "INP" : "DPD";
+        var trackingNumber = $"{trackingPrefix}{DateTime.UtcNow:yyMMdd}{Random.Shared.Next(100000, 999999)}";
+
         var order = new Order
         {
             UserId = userId,
@@ -136,13 +169,21 @@ public class OrdersController : ControllerBase
             ShippingAddress = dto.ShippingAddress ?? "",
             PaymentMethod = string.IsNullOrWhiteSpace(dto.PaymentMethod) ? "Card" : dto.PaymentMethod,
             Status = "Paid",
-            TotalPrice = totalPrice,
+            TotalPrice = finalPrice,
             ReturnStatus = "None",
+            CourierName = courier,
+            TrackingNumber = trackingNumber,
+            DiscountCode = discountCode,
+            DiscountAmount = discountAmount,
+            InvoiceNumber = $"FV/{DateTime.UtcNow:yyyy/MM}/{Random.Shared.Next(1000, 9999)}",
             CreatedAt = DateTime.UtcNow,
             Items = orderItems
         };
 
         _dbContext.Orders.Add(order);
+        await _dbContext.SaveChangesAsync();
+
+        order.InvoiceNumber = $"FV/{DateTime.UtcNow:yyyy/MM}/{order.Id:D5}";
         await _dbContext.SaveChangesAsync();
 
         _logger.LogInformation("Utworzono zamówienie #{OrderId} dla {Customer}", order.Id, order.CustomerName);
@@ -210,6 +251,144 @@ public class OrdersController : ControllerBase
         });
     }
 
+    [HttpPost("coupons/validate")]
+    public IActionResult ValidateCoupon([FromBody] ValidateCouponDto dto)
+    {
+        var code = dto.Code?.Trim().ToUpperInvariant() ?? "";
+        if (string.IsNullOrEmpty(code))
+        {
+            return BadRequest(new { valid = false, message = "Kod rabatowy nie może być pusty." });
+        }
+
+        decimal discountPercent = 0;
+        decimal discountFixed = 0;
+        string description = "";
+
+        switch (code)
+        {
+            case "START10":
+                discountPercent = 10;
+                description = "Rabat powitalny 10% na całe zamówienie";
+                break;
+            case "MOTO20":
+                discountFixed = 20;
+                description = "Zniżka 20 PLN na zakupy motoryzacyjne";
+                break;
+            case "WIOSNA15":
+                discountPercent = 15;
+                description = "Rabat sezonowy 15% na części i oleje";
+                break;
+            case "VIP25":
+                discountPercent = 25;
+                description = "Ekskluzywny rabat klubowy 25%";
+                break;
+            default:
+                return NotFound(new { valid = false, message = "Podany kod rabatowy jest nieprawidłowy lub wygasł." });
+        }
+
+        decimal calculatedDiscount = 0;
+        if (discountPercent > 0)
+        {
+            calculatedDiscount = Math.Round(dto.Amount * (discountPercent / 100m), 2);
+        }
+        else if (discountFixed > 0)
+        {
+            calculatedDiscount = Math.Min(dto.Amount, discountFixed);
+        }
+
+        return Ok(new
+        {
+            valid = true,
+            code,
+            discountPercent,
+            discountFixed,
+            discountAmount = (double)calculatedDiscount,
+            description
+        });
+    }
+
+    [HttpGet("{id:int}/invoice")]
+    public async Task<IActionResult> GetOrderInvoice(int id)
+    {
+        var order = await _dbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == id);
+        if (order == null)
+        {
+            return NotFound(new { message = $"Zamówienie #{id} nie istnieje." });
+        }
+
+        var invoiceNum = string.IsNullOrWhiteSpace(order.InvoiceNumber)
+            ? $"FV/{order.CreatedAt:yyyy/MM}/{order.Id:D5}"
+            : order.InvoiceNumber;
+
+        var itemsList = order.Items.Select(i =>
+        {
+            var grossUnit = i.UnitPrice;
+            var netUnit = Math.Round(grossUnit / 1.23m, 2);
+            var grossTotal = i.TotalPrice;
+            var netTotal = Math.Round(grossTotal / 1.23m, 2);
+            var vatTotal = grossTotal - netTotal;
+
+            return new
+            {
+                i.Id,
+                i.PartName,
+                i.PartNumber,
+                i.Quantity,
+                NetUnitPrice = (double)netUnit,
+                GrossUnitPrice = (double)grossUnit,
+                VatRate = "23%",
+                NetTotalPrice = (double)netTotal,
+                VatTotalPrice = (double)vatTotal,
+                GrossTotalPrice = (double)grossTotal
+            };
+        }).ToList();
+
+        var totalGross = order.TotalPrice;
+        var totalNet = Math.Round(totalGross / 1.23m, 2);
+        var totalVat = totalGross - totalNet;
+
+        return Ok(new
+        {
+            InvoiceNumber = invoiceNum,
+            OrderId = order.Id,
+            IssueDate = order.CreatedAt.ToString("yyyy-MM-dd"),
+            SaleDate = order.CreatedAt.ToString("yyyy-MM-dd"),
+            PaymentDueDate = order.CreatedAt.ToString("yyyy-MM-dd"),
+            PaymentMethod = order.PaymentMethod,
+            PaymentStatus = "OPŁACONO",
+            Seller = new
+            {
+                Name = "CarPartShop Sp. z o.o.",
+                Nip = "PL 521-384-91-02",
+                Regon = "142984512",
+                Address = "ul. Wyścigowa 42, 00-001 Warszawa",
+                BankName = "mBank S.A.",
+                BankAccount = "PL 48 1140 2004 0000 3102 7700 1001",
+                Email = "faktury@carpartshop.pl",
+                Phone = "+48 22 100 20 30"
+            },
+            Buyer = new
+            {
+                Name = order.CustomerName,
+                Email = order.Email,
+                Phone = order.Phone,
+                Address = order.ShippingAddress
+            },
+            Items = itemsList,
+            DiscountCode = order.DiscountCode ?? "",
+            DiscountAmount = (double)order.DiscountAmount,
+            TrackingNumber = order.TrackingNumber ?? "",
+            CourierName = order.CourierName ?? "",
+            Summary = new
+            {
+                TotalNet = (double)totalNet,
+                TotalVat = (double)totalVat,
+                TotalGross = (double)totalGross,
+                Currency = "PLN"
+            }
+        });
+    }
+
     private static object MapOrder(Order order) => new
     {
         order.Id,
@@ -223,6 +402,11 @@ public class OrdersController : ControllerBase
         order.PaymentMethod,
         order.ReturnStatus,
         ReturnReason = order.ReturnReason ?? "",
+        TrackingNumber = order.TrackingNumber ?? "",
+        CourierName = order.CourierName ?? "",
+        DiscountCode = order.DiscountCode ?? "",
+        DiscountAmount = (double)order.DiscountAmount,
+        InvoiceNumber = order.InvoiceNumber ?? "",
         Items = order.Items.Select(i => new
         {
             i.Id,

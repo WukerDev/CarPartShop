@@ -15,4 +15,5 @@ public class CarPart
     public string ImageUrl { get; set; } = string.Empty;
     public double Rating { get; set; } = 5.0;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public ICollection<ProductReview> Reviews { get; set; } = new List<ProductReview>();
 }
