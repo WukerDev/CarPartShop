@@ -4,10 +4,7 @@
     color="surface"
     elevation="4"
     border
-    role="button"
-    tabindex="0"
     @click="$emit('view-details', part)"
-    @keydown.enter="$emit('view-details', part)"
   >
     <div class="product-image-container position-relative overflow-hidden w-100 d-flex align-center justify-center">
       <v-img

@@ -2,6 +2,42 @@ import { test, expect } from '@playwright/test';
 
 test.describe('AutoParts Pro E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
+    await page.route('**/hubs/**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          negotiateVersion: 1,
+          connectionId: 'mock-connection-id',
+          availableTransports: []
+        })
+      });
+    });
+
+    await page.route('**/images/**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'image/jpeg',
+        body: ''
+      });
+    });
+
+    await page.route('**/api/vehicle/**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([])
+      });
+    });
+
+    await page.route('**/api/catalog/parts/*/reviews*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([])
+      });
+    });
+
     await page.route('**/api/catalog/categories', async route => {
       await route.fulfill({
         status: 200,

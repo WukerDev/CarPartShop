@@ -44,7 +44,8 @@ const router = createRouter({
     {
       path: '/profile',
       name: 'profile',
-      component: ProfileView
+      component: ProfileView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/login',
@@ -59,7 +60,7 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const token = localStorage.getItem('carpart_token');
-  if (to.name !== 'login' && !token) {
+  if (to.meta.requiresAuth && !token) {
     next({ name: 'login', query: { redirect: to.fullPath } });
   } else if (to.name === 'login' && token) {
     next({ name: 'catalog' });
