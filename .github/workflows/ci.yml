@@ -5,6 +5,13 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      package_somee:
+        description: 'Przygotuj paczkę wdrożeniową dla Somee.com (opcjonalne)'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   backend-and-tests:
@@ -97,10 +104,19 @@ jobs:
         run: npx playwright test
 
   package-somee-release:
-    name: Package Somee.com Deployment Release
+    name: Package Somee.com Deployment Release (Optional)
     runs-on: ubuntu-latest
     needs: [backend-and-tests, frontend-build-and-e2e]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    # Krok opcjonalny - nie blokuje głównego pipeline CI/CD.
+    # Uruchamiany tylko na żądanie:
+    # 1. Ręcznie z poziomu GitHub Actions (workflow_dispatch) z zaznaczoną opcją package_somee
+    # 2. Przy commitach zawierających w treści [somee] lub [deploy-somee]
+    # 3. Jeśli w zmiennych repozytorium GitHub ustawiono ENABLE_SOMEE='true'
+    if: |
+      (github.event_name == 'workflow_dispatch' && (inputs.package_somee == true || inputs.package_somee == 'true')) ||
+      contains(github.event.head_commit.message, '[somee]') ||
+      contains(github.event.head_commit.message, '[deploy-somee]') ||
+      vars.ENABLE_SOMEE == 'true'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -111,17 +127,28 @@ jobs:
           node-version: 22
 
       - name: Setup .NET SDK
+        id: setup-dotnet-somee
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+        continue-on-error: true
+
+      - name: Fallback Setup .NET SDK
+        if: steps.setup-dotnet-somee.outcome != 'success'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+        continue-on-error: true
 
       - name: Build Frontend SPA
         working-directory: src/Frontend
+        continue-on-error: true
         run: |
           npm ci
           npm run build
 
       - name: Publish Backend with Embedded SPA
+        continue-on-error: true
         run: |
           dotnet publish src/Backend/CarPartShop.Backend/CarPartShop.Backend.csproj -c Release -o dist-package
           mkdir -p dist-package/wwwroot
@@ -130,6 +157,7 @@ jobs:
           cp src/Backend/CarPartShop.Backend/web.config dist-package/web.config
 
       - name: Upload Somee Deployment Artifact
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: somee-iis-package

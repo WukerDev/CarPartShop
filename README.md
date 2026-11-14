@@ -201,7 +201,11 @@ Archiwum `carpartshop-somee.zip` wystarczy wgrać i rozpakować w panelu Somee.c
 ## ⚙️ GitHub Actions CI/CD Pipeline
 
 Plik workflow [.github/workflows/ci.yml](file:///.github/workflows/ci.yml) automatycznie wykonuje przy każdym pushu i pull requeście:
-1. **Backend & Tests:** Budowanie `CarPartShop.Backend.sln` i uruchomienie 41 testów jednostkowych xUnit.
-2. **Gateway:** Budowanie `CarPartShop.Gateway.sln`.
-3. **Frontend & E2E:** Instalacja zależności, weryfikacja typów TypeScript (`vue-tsc`), 26 testów Vitest, build Vite oraz testy Playwright E2E.
-4. **Automatyczny Release Somee:** Przy commitach na gałąź główną automatycznie tworzy paczkę produkcyjną i zapisuje ją w GitHub Actions Artifacts (`somee-iis-package`).
+1. **Backend & Tests (Wymagany):** Budowanie `CarPartShop.Backend.sln` i uruchomienie 41 testów jednostkowych xUnit.
+2. **Gateway (Wymagany):** Budowanie `CarPartShop.Gateway.sln`.
+3. **Frontend & E2E (Wymagany):** Instalacja zależności, weryfikacja typów TypeScript (`vue-tsc`), 26 testów Vitest, build Vite oraz testy Playwright E2E.
+4. **Paczka Somee.com (Krok Opcjonalny):** Nie blokuje pipeline'u i uruchamia się wyłącznie na żądanie:
+   - Ręcznie przez zakładkę **Actions -> Run workflow** z zaznaczoną opcją `Przygotuj paczkę wdrożeniową dla Somee.com`.
+   - Poprzez dodanie w treści commita taga `[somee]` lub `[deploy-somee]`.
+   - Poprzez ustawienie zmiennej repozytorium GitHub `ENABLE_SOMEE=true`.
+   Wszystkie kroki budowania paczki Somee posiadają flagę `continue-on-error`, dzięki czemu ewentualne problemy z hostingiem Somee nie unieważniają statusu pipeline.
