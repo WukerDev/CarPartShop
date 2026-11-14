@@ -92,6 +92,29 @@ export const useOrderStore = defineStore('orders', {
       if (order) {
         order.status = status;
       }
+    },
+
+    async changeOrderStatus(
+      orderId: number,
+      status: string,
+      trackingNumber?: string,
+      courierName?: string
+    ) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const updated = await api.updateOrderStatus(orderId, status, trackingNumber, courierName);
+        const idx = this.orders.findIndex(o => o.id === orderId);
+        if (idx !== -1) {
+          this.orders[idx] = updated;
+        }
+        return updated;
+      } catch (err: any) {
+        this.error = err.message || 'Błąd zmiany statusu zamówienia';
+        throw err;
+      } finally {
+        this.loading = false;
+      }
     }
   }
 });

@@ -38,6 +38,7 @@ public class OrdersController : ControllerBase
 
     public record ReturnRequestDto(int OrderId, string Reason, string Comments);
     public record ValidateCouponDto(string Code, decimal Amount);
+    public record UpdateOrderStatusDto(string Status, string? TrackingNumber = null, string? CourierName = null);
 
     [HttpGet]
     public async Task<IActionResult> GetOrders([FromQuery] string? userId, [FromQuery] string? email)
@@ -249,6 +250,51 @@ public class OrdersController : ControllerBase
             OrderId = order.Id,
             NewStatus = "Returned"
         });
+    }
+
+    [HttpPut("{id:int}/status")]
+    public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Status))
+            return BadRequest(new { message = "Status zamówienia jest wymagany." });
+
+        var validStatuses = new[] { "Created", "Paid", "Processing", "Shipped", "Delivered", "Cancelled", "Returned" };
+        var matchedStatus = validStatuses.FirstOrDefault(s => s.Equals(dto.Status.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (matchedStatus == null)
+            return BadRequest(new { message = $"Nieznany status: {dto.Status}. Dopuszczalne: {string.Join(", ", validStatuses)}" });
+
+        var order = await _dbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == id);
+        if (order == null)
+            return NotFound(new { message = $"Zamówienie #{id} nie istnieje." });
+
+        var oldStatus = order.Status;
+        order.Status = matchedStatus;
+        order.UpdatedAt = DateTime.UtcNow;
+
+        if (!string.IsNullOrWhiteSpace(dto.TrackingNumber))
+            order.TrackingNumber = dto.TrackingNumber.Trim();
+        if (!string.IsNullOrWhiteSpace(dto.CourierName))
+            order.CourierName = dto.CourierName.Trim();
+
+        if (matchedStatus == "Cancelled" && oldStatus != "Cancelled" && oldStatus != "Returned")
+        {
+            foreach (var item in order.Items)
+            {
+                var part = await _dbContext.CarParts.FindAsync(item.CarPartId);
+                if (part != null)
+                {
+                    part.StockQuantity += item.Quantity;
+                    await _hubContext.Clients.All.SendAsync("ReceiveStockUpdate", part.Id, part.StockQuantity);
+                }
+            }
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        var statusMessage = $"Status zamówienia #{order.Id} został zmieniony z {oldStatus} na {order.Status}.";
+        await _hubContext.Clients.All.SendAsync("ReceiveOrderStatusChanged", order.Id, order.Status, statusMessage);
+
+        return Ok(MapOrder(order));
     }
 
     [HttpPost("coupons/validate")]

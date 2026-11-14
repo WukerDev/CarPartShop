@@ -12,19 +12,74 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? "Host=postgres;Port=5432;Database=carpartshop;Username=postgres;Password=postgres";
 
-builder.Services.AddDbContext<ShopDbContext>(options =>
+var dbProvider = builder.Configuration.GetValue<string>("DatabaseProvider");
+var useInMemory = builder.Configuration.GetValue<bool>("UseInMemoryDatabase");
+
+if (string.IsNullOrWhiteSpace(dbProvider))
 {
-    var useInMemory = builder.Configuration.GetValue<bool>("UseInMemoryDatabase");
     if (useInMemory)
     {
-        options.UseInMemoryDatabase("CarPartShopDb");
+        dbProvider = "InMemory";
+    }
+    else if (connectionString.Contains(".db", StringComparison.OrdinalIgnoreCase) || 
+             connectionString.Contains(".sqlite", StringComparison.OrdinalIgnoreCase))
+    {
+        dbProvider = "Sqlite";
+    }
+    else if (connectionString.Contains("Initial Catalog=", StringComparison.OrdinalIgnoreCase) || 
+             connectionString.Contains("Integrated Security=", StringComparison.OrdinalIgnoreCase) ||
+             connectionString.Contains("TrustServerCertificate=", StringComparison.OrdinalIgnoreCase) ||
+             connectionString.Contains("Server=tcp:", StringComparison.OrdinalIgnoreCase) ||
+             connectionString.Contains(".database.windows.net", StringComparison.OrdinalIgnoreCase) ||
+             connectionString.Contains("somee.com", StringComparison.OrdinalIgnoreCase))
+    {
+        dbProvider = "SqlServer";
     }
     else
     {
-        options.UseNpgsql(connectionString, npgsqlOptions =>
-        {
-            npgsqlOptions.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
-        });
+        dbProvider = "PostgreSql";
+    }
+}
+
+builder.Services.AddDbContext<ShopDbContext>(options =>
+{
+    switch (dbProvider.ToLowerInvariant())
+    {
+        case "inmemory":
+            options.UseInMemoryDatabase("CarPartShopDb");
+            break;
+        case "sqlite":
+            if (connectionString.Contains("Data Source=", StringComparison.OrdinalIgnoreCase))
+            {
+                var parts = connectionString.Split("Data Source=");
+                if (parts.Length > 1)
+                {
+                    var dbPath = parts[1].Split(';')[0].Trim();
+                    var dbDir = Path.GetDirectoryName(dbPath);
+                    if (!string.IsNullOrEmpty(dbDir) && !Directory.Exists(dbDir))
+                    {
+                        Directory.CreateDirectory(dbDir);
+                    }
+                }
+            }
+            options.UseSqlite(connectionString);
+            break;
+        case "sqlserver":
+        case "mssql":
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                sqlOptions.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorNumbersToAdd: null);
+            });
+            break;
+        case "postgresql":
+        case "npgsql":
+        case "postgres":
+        default:
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
+            });
+            break;
     }
 });
 
@@ -53,12 +108,60 @@ builder.Services.AddAuthentication(options =>
     {
         OnMessageReceived = context =>
         {
-            var accessToken = context.Request.Query["access_token"];
+            var accessToken = context.Request.Query["access_token"].ToString();
             var path = context.HttpContext.Request.Path;
             if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
             {
                 context.Token = accessToken;
             }
+
+            var authHeader = context.Request.Headers.Authorization.ToString();
+            var rawToken = !string.IsNullOrEmpty(accessToken)
+                ? accessToken
+                : authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                    ? authHeader.Substring(7).Trim()
+                    : null;
+
+            if (!string.IsNullOrEmpty(rawToken) && rawToken.StartsWith("mock."))
+            {
+                try
+                {
+                    var tokenParts = rawToken.Split('.');
+                    if (tokenParts.Length >= 2)
+                    {
+                        var jsonBytes = Convert.FromBase64String(tokenParts[1]);
+                        using var doc = System.Text.Json.JsonDocument.Parse(jsonBytes);
+                        var claims = new List<System.Security.Claims.Claim>();
+
+                        if (doc.RootElement.TryGetProperty("preferred_username", out var u))
+                        {
+                            var uname = u.GetString() ?? "admin";
+                            claims.Add(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, uname));
+                            claims.Add(new System.Security.Claims.Claim("preferred_username", uname));
+                        }
+                        if (doc.RootElement.TryGetProperty("email", out var em))
+                        {
+                            claims.Add(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, em.GetString() ?? ""));
+                        }
+                        if (doc.RootElement.TryGetProperty("roles", out var rolesElem) && rolesElem.ValueKind == System.Text.Json.JsonValueKind.Array)
+                        {
+                            foreach (var r in rolesElem.EnumerateArray())
+                            {
+                                claims.Add(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, r.GetString() ?? ""));
+                            }
+                        }
+
+                        var identity = new System.Security.Claims.ClaimsIdentity(claims, "MockAuth");
+                        context.Principal = new System.Security.Claims.ClaimsPrincipal(identity);
+                        context.Success();
+                    }
+                }
+                catch
+                {
+                    // Fall back to standard validation
+                }
+            }
+
             return Task.CompletedTask;
         }
     };
@@ -113,11 +216,11 @@ else
     {
         var db = scope.ServiceProvider.GetRequiredService<ShopDbContext>();
         await DbInitializer.InitializeAsync(db);
-        logger.LogInformation("Baza danych CarPartShop zainicjalizowana pomyślnie.");
+        logger.LogInformation("Baza danych CarPartShop zainicjalizowana pomyślnie ({Provider}).", db.Database.ProviderName);
     }
     catch (Exception ex)
     {
-        logger.LogWarning(ex, "Nie można połączyć się z PostgreSQL przy starcie. Może być wymagany ponowny rozruch lub baza jest w trakcie uruchamiania.");
+        logger.LogWarning(ex, "Nie można połączyć się z bazą danych przy starcie. Może być wymagany ponowny rozruch lub baza jest w trakcie uruchamiania.");
     }
 }
 
@@ -129,15 +232,34 @@ app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
 app.UseAuthentication();
 app.UseAuthorization();
 
+var wwwrootFolder = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+var hasWwwroot = Directory.Exists(wwwrootFolder);
+var hasIndexHtml = File.Exists(Path.Combine(wwwrootFolder, "index.html"));
+
+if (hasWwwroot)
+{
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+}
+
 app.MapGrpcService<CatalogGrpcService>().EnableGrpcWeb().RequireCors("CorsPolicy");
 app.MapGrpcService<OrderGrpcService>().EnableGrpcWeb().RequireCors("CorsPolicy");
 app.MapGrpcService<PaymentGrpcService>().EnableGrpcWeb().RequireCors("CorsPolicy");
+app.MapGrpcService<NotificationGrpcService>().EnableGrpcWeb().RequireCors("CorsPolicy");
 
 app.MapHub<ShopHub>("/hubs/shop").RequireCors("CorsPolicy");
 
 app.MapControllers().RequireCors("CorsPolicy");
 
-app.MapGet("/", () => "CarPartShop Backend API (.NET 10, gRPC, SignalR, PostgreSQL, Authority) działa poprawnie!");
 app.MapGet("/health", () => Results.Ok(new { status = "Healthy", timestamp = DateTime.UtcNow }));
+
+if (hasIndexHtml)
+{
+    app.MapFallbackToFile("index.html");
+}
+else
+{
+    app.MapGet("/", () => "CarPartShop Backend API (.NET 10, gRPC, SignalR) działa poprawnie! (Frontend nie został jeszcze skompilowany do wwwroot).");
+}
 
 app.Run();

@@ -16,6 +16,7 @@ public class ShopDbContext : DbContext
     public DbSet<ReturnRequest> ReturnRequests => Set<ReturnRequest>();
     public DbSet<VehicleModel> Vehicles => Set<VehicleModel>();
     public DbSet<ProductReview> ProductReviews => Set<ProductReview>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -99,6 +100,16 @@ public class ShopDbContext : DbContext
                   .WithMany(p => p.Reviews)
                   .HasForeignKey(r => r.CarPartId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(n => n.Id);
+            entity.Property(n => n.Title).IsRequired().HasMaxLength(200);
+            entity.Property(n => n.Message).IsRequired().HasMaxLength(1000);
+            entity.Property(n => n.Type).HasMaxLength(50);
+            entity.Property(n => n.Link).HasMaxLength(250);
+            entity.HasIndex(n => n.CreatedAt);
         });
     }
 }
