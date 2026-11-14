@@ -15,11 +15,14 @@ import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import NotificationToast from '@/components/NotificationToast.vue';
 import { useSignalRStore } from '@/stores/signalrStore';
+import { useNotificationStore } from '@/stores/notificationStore';
 
 const signalrStore = useSignalRStore();
+const notificationStore = useNotificationStore();
 
 onMounted(() => {
   signalrStore.init();
+  notificationStore.fetchNotifications();
 });
 </script>
 

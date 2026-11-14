@@ -4,6 +4,7 @@ type OrderStatusCallback = (orderId: number, status: string, message: string) =>
 type StockUpdateCallback = (partId: number, newStock: number) => void;
 type ReturnUpdateCallback = (orderId: number, returnStatus: string, message: string) => void;
 type OrderPlacedCallback = (orderId: number, customerName: string, total: number) => void;
+type NotificationCallback = (notification: any, unreadCount: number) => void;
 
 class SignalRService {
   private connection: signalR.HubConnection | null = null;
@@ -11,6 +12,7 @@ class SignalRService {
   private stockUpdateListeners: StockUpdateCallback[] = [];
   private returnUpdateListeners: ReturnUpdateCallback[] = [];
   private orderPlacedListeners: OrderPlacedCallback[] = [];
+  private notificationListeners: NotificationCallback[] = [];
 
   public async startConnection(token?: string | null): Promise<void> {
     if (this.connection) {
@@ -42,6 +44,10 @@ class SignalRService {
 
     this.connection.on('ReceiveOrderPlaced', (orderId: number, customerName: string, total: number) => {
       this.orderPlacedListeners.forEach(cb => cb(orderId, customerName, total));
+    });
+
+    this.connection.on('ReceiveNotification', (notification: any, unreadCount: number) => {
+      this.notificationListeners.forEach(cb => cb(notification, unreadCount));
     });
 
     try {
@@ -77,6 +83,13 @@ class SignalRService {
     this.orderPlacedListeners.push(cb);
     return () => {
       this.orderPlacedListeners = this.orderPlacedListeners.filter(l => l !== cb);
+    };
+  }
+
+  public onNotification(cb: NotificationCallback): () => void {
+    this.notificationListeners.push(cb);
+    return () => {
+      this.notificationListeners = this.notificationListeners.filter(l => l !== cb);
     };
   }
 

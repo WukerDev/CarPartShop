@@ -39,7 +39,8 @@ export default {
     seeding: 'Ładowanie danych...',
     seedSuccess: 'Baza danych została pomyślnie zasilona gotowymi danymi!',
     logout: 'Wyloguj się',
-    login: 'Zaloguj się'
+    login: 'Zaloguj się',
+    notifications: 'Powiadomienia'
   },
   hero: {
     badge: 'Sklep Motoryzacyjny Nowej Generacji',
@@ -74,7 +75,18 @@ export default {
     activeVehicle: 'Dopasowanie do pojazdu:',
     clearVehicle: 'Wyczyść pojazd',
     allVehicles: 'Wszystkie auta',
-    fitsYourVehicle: 'Pasuje do Twojego auta'
+    fitsYourVehicle: 'Pasuje do Twojego auta',
+    addPartBtn: 'Dodaj część',
+    addPartTitle: 'Dodawanie Nowej Części Samochodowej',
+    partNameLabel: 'Nazwa części',
+    partNumberLabel: 'Numer OEM / Kod części',
+    categoryLabel: 'Kategoria',
+    manufacturerLabel: 'Producent',
+    priceLabel: 'Cena (PLN)',
+    stockQuantityLabel: 'Stan magazynowy (szt.)',
+    compatibilityLabel: 'Kompatybilność z autami',
+    descriptionLabel: 'Opis techniczny',
+    savePartBtn: 'Zapisz nową część'
   },
   product: {
     stockAvailable: '{count} sztuk w magazynie centralnym',
@@ -251,11 +263,19 @@ export default {
       mismatch: 'Towar niezgodny z opisem katalogowym',
       other: 'Inny powód rezygnacji'
     },
+    manageStatus: 'Zarządzaj statusem',
+    statusDialogTitle: 'Zarządzanie Statusem Zamówienia #{id}',
+    statusDialogDesc: 'Jako administrator możesz zmienić status zamówienia oraz przypisać kuriera i numer listu przewozowego.',
+    statusLabel: 'Nowy status zamówienia',
+    courierLabel: 'Kurier / Przewoźnik',
+    trackingLabel: 'Numer listu przewozowego (Tracking)',
+    saveStatus: 'Zapisz i powiadom klienta',
     status: {
       paid: 'Opłacone',
       completed: 'Zrealizowane',
       processing: 'W trakcie kompletacji',
       shipped: 'Wysłane kurierem',
+      delivered: 'Dostarczone',
       returned: 'Zwrócone',
       cancelled: 'Anulowane'
     }
@@ -355,12 +375,23 @@ export default {
     copyright: '© 2026 AutoParts Pro Sp. z o.o. Wszelkie prawa zastrzeżone.'
   },
   notifications: {
+    title: 'Powiadomienia',
+    new: 'nowe',
+    markAllAsRead: 'Oznacz wszystkie jako przeczytane',
+    markAsRead: 'Oznacz jako przeczytane',
+    empty: 'Brak nowych powiadomień',
+    promoBadge: 'Promocja',
+    orderBadge: 'Zamówienie',
     addedToCart: 'Dodano do koszyka: {name}',
     addedToCartQty: 'Dodano do koszyka: {name} ({quantity} szt.)',
     addedToCartCount: 'Dodano do koszyka: {name} ({count} szt.)',
     orderSuccess: 'Zamówienie #{id} opłacone pomyślnie. Kod transakcji: {txId}',
     returnSuccess: 'Zwrot został pomyślnie zaakceptowany!',
     returnError: 'Nie udało się zrealizować zwrotu.',
+    statusUpdatedSuccess: 'Status zamówienia został zaktualizowany!',
+    statusUpdatedError: 'Nie udało się zaktualizować statusu zamówienia.',
+    partCreatedSuccess: 'Nowa część została pomyślnie dodana do katalogu!',
+    partCreatedError: 'Wystąpił błąd podczas dodawania części.',
     loginSuccess: 'Zalogowano pomyślnie jako {name}!'
   },
   signalr: {

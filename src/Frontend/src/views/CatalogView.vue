@@ -252,6 +252,19 @@
       </v-col>
 
       <v-col cols="12" sm="6" md="4" class="d-flex justify-end align-center">
+        <v-btn
+          v-if="authStore.isAdmin"
+          color="primary"
+          variant="flat"
+          prepend-icon="mdi-plus"
+          size="small"
+          rounded="lg"
+          class="mr-3 font-weight-bold text-none"
+          @click="openAddPartDialog"
+        >
+          {{ $t('catalog.addPartBtn') }}
+        </v-btn>
+
         <v-switch
           v-model="catalogStore.inStockOnly"
           color="success"
@@ -302,6 +315,119 @@
       v-model="detailsOpen"
       :part="selectedPart"
     />
+
+    <v-dialog v-model="addPartDialogOpen" max-width="650">
+      <v-card color="surface" class="rounded-2xl pa-4" border>
+        <v-card-title class="d-flex align-center justify-space-between pb-3 border-b">
+          <div class="d-flex align-center">
+            <v-icon icon="mdi-plus-box" color="primary" class="mr-2" size="24"></v-icon>
+            <span class="text-subtitle-1 font-weight-bold text-white">{{ $t('catalog.addPartTitle') }}</span>
+          </div>
+          <v-btn icon="mdi-close" variant="text" size="small" @click="addPartDialogOpen = false"></v-btn>
+        </v-card-title>
+
+        <v-card-text class="pt-4">
+          <v-row dense>
+            <v-col cols="12" sm="8">
+              <v-text-field
+                v-model="newPartForm.name"
+                :label="$t('catalog.partNameLabel')"
+                placeholder="np. Tarcze hamulcowe Brembo Xtra"
+                variant="outlined"
+                density="compact"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="4">
+              <v-text-field
+                v-model="newPartForm.partNumber"
+                :label="$t('catalog.partNumberLabel')"
+                placeholder="np. BRE-09.9772.11"
+                variant="outlined"
+                density="compact"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-select
+                v-model="newPartForm.categoryId"
+                :items="catalogStore.categories"
+                item-title="name"
+                item-value="id"
+                :label="$t('catalog.categoryLabel')"
+                variant="outlined"
+                density="compact"
+              ></v-select>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="newPartForm.manufacturer"
+                :label="$t('catalog.manufacturerLabel')"
+                placeholder="np. Brembo, Bosch, ATE"
+                variant="outlined"
+                density="compact"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model.number="newPartForm.price"
+                type="number"
+                min="1"
+                step="0.01"
+                :label="$t('catalog.priceLabel')"
+                variant="outlined"
+                density="compact"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model.number="newPartForm.stockQuantity"
+                type="number"
+                min="0"
+                :label="$t('catalog.stockQuantityLabel')"
+                variant="outlined"
+                density="compact"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                v-model="newPartForm.compatibility"
+                :label="$t('catalog.compatibilityLabel')"
+                placeholder="np. VW Golf VII, Audi A3 8V, Seat Leon III"
+                variant="outlined"
+                density="compact"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-textarea
+                v-model="newPartForm.description"
+                :label="$t('catalog.descriptionLabel')"
+                placeholder="Szczegółowy opis techniczny części..."
+                variant="outlined"
+                density="compact"
+                rows="2"
+              ></v-textarea>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-card-actions class="pt-2 pb-1">
+          <v-spacer></v-spacer>
+          <v-btn variant="text" color="grey" class="text-none" @click="addPartDialogOpen = false">
+            {{ $t('common.cancel') }}
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="flat"
+            class="text-none font-weight-bold px-5"
+            rounded="lg"
+            :loading="savingPart"
+            :disabled="!newPartForm.name || !newPartForm.partNumber || newPartForm.price <= 0"
+            @click="submitCreatePart"
+          >
+            {{ $t('catalog.savePartBtn') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -310,6 +436,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/authStore';
 import { useCatalogStore } from '@/stores/catalogStore';
+import { useSignalRStore } from '@/stores/signalrStore';
 import ProductCard from '@/components/ProductCard.vue';
 import ProductDetailModal from '@/components/ProductDetailModal.vue';
 import type { CarPart } from '@/types';
@@ -317,8 +444,59 @@ import type { CarPart } from '@/types';
 const { t } = useI18n();
 const authStore = useAuthStore();
 const catalogStore = useCatalogStore();
+const signalrStore = useSignalRStore();
 const detailsOpen = ref(false);
 const selectedPart = ref<CarPart | null>(null);
+
+const addPartDialogOpen = ref(false);
+const savingPart = ref(false);
+const newPartForm = ref({
+  name: '',
+  partNumber: '',
+  categoryId: 1,
+  manufacturer: '',
+  price: 99.0,
+  stockQuantity: 10,
+  compatibility: '',
+  description: ''
+});
+
+function openAddPartDialog() {
+  if (catalogStore.categories.length > 0) {
+    newPartForm.value.categoryId = catalogStore.categories[0].id;
+  }
+  newPartForm.value.name = '';
+  newPartForm.value.partNumber = '';
+  newPartForm.value.manufacturer = '';
+  newPartForm.value.price = 99.0;
+  newPartForm.value.stockQuantity = 10;
+  newPartForm.value.compatibility = '';
+  newPartForm.value.description = '';
+  addPartDialogOpen.value = true;
+}
+
+async function submitCreatePart() {
+  if (!newPartForm.value.name || !newPartForm.value.partNumber || newPartForm.value.price <= 0) return;
+  savingPart.value = true;
+  try {
+    await catalogStore.createPart({
+      name: newPartForm.value.name,
+      partNumber: newPartForm.value.partNumber,
+      categoryId: newPartForm.value.categoryId,
+      manufacturer: newPartForm.value.manufacturer || 'OEM',
+      price: newPartForm.value.price,
+      stockQuantity: newPartForm.value.stockQuantity,
+      compatibility: newPartForm.value.compatibility || 'Uniwersalna',
+      description: newPartForm.value.description || newPartForm.value.name
+    });
+    signalrStore.addNotification('success', t('notifications.partCreatedSuccess'));
+    addPartDialogOpen.value = false;
+  } catch (err: any) {
+    signalrStore.addNotification('error', err.message || t('notifications.partCreatedError'));
+  } finally {
+    savingPart.value = false;
+  }
+}
 
 const displayCategoryName = computed(() => {
   if (!catalogStore.selectedCategoryId) {

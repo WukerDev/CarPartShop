@@ -26,3 +26,12 @@ playwright/.cache/
 # OS
 .DS_Store
 Thumbs.db
+
+# Somee / Deploy artifacts
+dist-somee/
+*.zip
+wwwroot/
+App_Data/
+*.db
+*.db-shm
+*.db-wal

@@ -128,6 +128,114 @@
         </v-list>
       </v-menu>
 
+      <!-- Dzwoneczek Powiadomień -->
+      <v-menu
+        v-model="notificationsMenuOpen"
+        location="bottom end"
+        :close-on-content-click="false"
+        min-width="340"
+        max-width="400"
+      >
+        <template #activator="{ props }">
+          <v-btn
+            icon
+            variant="text"
+            v-bind="props"
+            class="mr-1"
+            :title="$t('notifications.title')"
+          >
+            <v-badge
+              :content="notificationStore.unreadCount"
+              :model-value="notificationStore.unreadCount > 0"
+              color="error"
+              overlap
+            >
+              <v-icon
+                :icon="notificationStore.unreadCount > 0 ? 'mdi-bell-ring-outline' : 'mdi-bell-outline'"
+                :color="notificationStore.unreadCount > 0 ? 'warning' : undefined"
+              ></v-icon>
+            </v-badge>
+          </v-btn>
+        </template>
+
+        <v-card bg-color="#0E1E21" class="border rounded-xl elevation-8 overflow-hidden">
+          <v-card-title class="d-flex align-center justify-space-between px-4 py-3 border-b bg-surface-variant">
+            <div class="d-flex align-center">
+              <v-icon icon="mdi-bell-outline" color="primary" class="mr-2"></v-icon>
+              <span class="text-subtitle-1 font-weight-bold text-white">{{ $t('notifications.title') }}</span>
+              <v-chip v-if="notificationStore.unreadCount > 0" size="x-small" color="error" class="ml-2 font-weight-bold">
+                {{ notificationStore.unreadCount }} {{ $t('notifications.new') }}
+              </v-chip>
+            </div>
+            <v-btn
+              v-if="notificationStore.unreadCount > 0"
+              variant="text"
+              size="x-small"
+              color="primary"
+              class="text-none font-weight-bold"
+              @click="notificationStore.markAllAsRead"
+            >
+              {{ $t('notifications.markAllAsRead') }}
+            </v-btn>
+          </v-card-title>
+
+          <v-card-text class="pa-0" style="max-height: 400px; overflow-y: auto;">
+            <div v-if="notificationStore.loading" class="text-center py-6">
+              <v-progress-circular indeterminate color="primary" size="28"></v-progress-circular>
+            </div>
+
+            <div v-else-if="notificationStore.notifications.length === 0" class="text-center py-8 px-4 text-grey">
+              <v-icon icon="mdi-bell-sleep-outline" size="40" class="mb-2 text-grey-darken-1"></v-icon>
+              <div class="text-body-2">{{ $t('notifications.empty') }}</div>
+            </div>
+
+            <v-list v-else lines="two" bg-color="transparent" class="pa-0">
+              <v-list-item
+                v-for="item in notificationStore.notifications"
+                :key="item.id"
+                :class="[
+                  'px-4 py-3 border-b transition-all',
+                  !item.isRead ? 'bg-primary-darken-4' : 'opacity-80'
+                ]"
+                style="cursor: pointer;"
+                @click="markAndNavigate(item)"
+              >
+                <template #prepend>
+                  <v-avatar :color="getNotificationColor(item.type)" size="36" class="mr-3 elevation-1">
+                    <v-icon :icon="getNotificationIcon(item.type)" size="20" color="white"></v-icon>
+                  </v-avatar>
+                </template>
+
+                <v-list-item-title class="font-weight-bold text-body-2 mb-1 d-flex align-center justify-space-between">
+                  <span :class="!item.isRead ? 'text-white' : 'text-grey-lighten-2'">
+                    {{ item.title }}
+                  </span>
+                  <v-badge v-if="!item.isRead" dot inline color="primary"></v-badge>
+                </v-list-item-title>
+
+                <v-list-item-subtitle class="text-caption text-grey-lighten-1" style="white-space: normal; line-height: 1.4;">
+                  {{ item.message }}
+                </v-list-item-subtitle>
+
+                <div class="d-flex align-center justify-space-between mt-2 text-caption text-grey">
+                  <span>{{ formatDate(item.createdAt) }}</span>
+                  <v-btn
+                    v-if="!item.isRead"
+                    size="x-small"
+                    variant="text"
+                    color="primary"
+                    class="text-none font-weight-bold pa-0"
+                    @click.stop="notificationStore.markAsRead(item.id)"
+                  >
+                    {{ $t('notifications.markAsRead') }}
+                  </v-btn>
+                </div>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-menu>
+
       <v-btn
         icon
         variant="text"
@@ -335,6 +443,19 @@
           </v-chip>
         </template>
       </v-list-item>
+
+      <v-list-item
+        prepend-icon="mdi-bell-outline"
+        rounded="lg"
+        @click="notificationsMenuOpen = true; drawer = false"
+      >
+        <v-list-item-title class="font-weight-medium">{{ $t('notifications.title') }}</v-list-item-title>
+        <template #append>
+          <v-chip v-if="notificationStore.unreadCount > 0" size="x-small" color="error" variant="flat">
+            {{ notificationStore.unreadCount }}
+          </v-chip>
+        </template>
+      </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -347,15 +468,19 @@ import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
+import { useNotificationStore } from '@/stores/notificationStore';
+import type { AppNotification } from '@/types';
 
 const router = useRouter();
 const authStore = useAuthStore();
 const cartStore = useCartStore();
 const catalogStore = useCatalogStore();
 const wishlistStore = useWishlistStore();
+const notificationStore = useNotificationStore();
 const { locale } = useI18n();
 
 const drawer = ref(false);
+const notificationsMenuOpen = ref(false);
 
 const currentLocale = computed(() => locale.value);
 const currentLocaleLabel = computed(() => locale.value === 'pl' ? 'PL' : 'EN');
@@ -374,6 +499,43 @@ function onSearch() {
 function handleLogout() {
   authStore.logout();
   router.push('/login');
+}
+
+function getNotificationIcon(type: string): string {
+  switch (type) {
+    case 'promo': return 'mdi-tag-percent';
+    case 'order': return 'mdi-truck-fast';
+    case 'warning': return 'mdi-alert-circle-outline';
+    default: return 'mdi-information-outline';
+  }
+}
+
+function getNotificationColor(type: string): string {
+  switch (type) {
+    case 'promo': return 'warning';
+    case 'order': return 'primary';
+    case 'warning': return 'error';
+    default: return 'info';
+  }
+}
+
+async function markAndNavigate(notification: AppNotification) {
+  if (!notification.isRead) {
+    await notificationStore.markAsRead(notification.id);
+  }
+  if (notification.link) {
+    notificationsMenuOpen.value = false;
+    router.push(notification.link);
+  }
+}
+
+function formatDate(dateStr: string): string {
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ', ' + d.toLocaleDateString();
+  } catch {
+    return dateStr;
+  }
 }
 </script>
 

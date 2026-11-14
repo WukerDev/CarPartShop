@@ -39,7 +39,8 @@ export default {
     seeding: 'Seeding data...',
     seedSuccess: 'Database successfully seeded with sample data!',
     logout: 'Log out',
-    login: 'Log in'
+    login: 'Log in',
+    notifications: 'Notifications'
   },
   hero: {
     badge: 'Next Generation Automotive Store',
@@ -74,7 +75,18 @@ export default {
     activeVehicle: 'Vehicle fitment:',
     clearVehicle: 'Clear vehicle',
     allVehicles: 'All vehicles',
-    fitsYourVehicle: 'Fits your vehicle'
+    fitsYourVehicle: 'Fits your vehicle',
+    addPartBtn: 'Add Part',
+    addPartTitle: 'Add New Auto Part',
+    partNameLabel: 'Part Name',
+    partNumberLabel: 'OEM Number / Part Code',
+    categoryLabel: 'Category',
+    manufacturerLabel: 'Manufacturer',
+    priceLabel: 'Price (PLN)',
+    stockQuantityLabel: 'Stock Quantity',
+    compatibilityLabel: 'Vehicle Compatibility',
+    descriptionLabel: 'Technical Description',
+    savePartBtn: 'Save New Part'
   },
   product: {
     stockAvailable: '{count} units in central warehouse',
@@ -251,11 +263,19 @@ export default {
       mismatch: 'Item does not match catalog description',
       other: 'Other cancellation reason'
     },
+    manageStatus: 'Manage Status',
+    statusDialogTitle: 'Manage Status for Order #{id}',
+    statusDialogDesc: 'As an administrator, you can update order status and specify courier tracking information.',
+    statusLabel: 'New Order Status',
+    courierLabel: 'Courier / Carrier',
+    trackingLabel: 'Tracking Number',
+    saveStatus: 'Save and Notify Customer',
     status: {
       paid: 'Paid',
       completed: 'Completed',
       processing: 'Processing',
       shipped: 'Shipped',
+      delivered: 'Delivered',
       returned: 'Returned',
       cancelled: 'Cancelled'
     }
@@ -355,12 +375,23 @@ export default {
     copyright: '© 2026 AutoParts Pro Sp. z o.o. All rights reserved.'
   },
   notifications: {
+    title: 'Notifications',
+    new: 'new',
+    markAllAsRead: 'Mark all as read',
+    markAsRead: 'Mark as read',
+    empty: 'No new notifications',
+    promoBadge: 'Promotion',
+    orderBadge: 'Order',
     addedToCart: 'Added to cart: {name}',
     addedToCartQty: 'Added to cart: {name} ({quantity} pcs)',
     addedToCartCount: 'Added to cart: {name} ({count} pcs)',
     orderSuccess: 'Order #{id} paid successfully. Transaction code: {txId}',
     returnSuccess: 'Return request was approved successfully!',
     returnError: 'Failed to submit return request.',
+    statusUpdatedSuccess: 'Order status updated successfully!',
+    statusUpdatedError: 'Failed to update order status.',
+    partCreatedSuccess: 'New part has been added to the catalog!',
+    partCreatedError: 'Failed to add new part.',
     loginSuccess: 'Logged in successfully as {name}!'
   },
   signalr: {

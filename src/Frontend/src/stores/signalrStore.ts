@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { signalRService } from '@/services/signalrClient';
 import { useCatalogStore } from './catalogStore';
 import { useOrderStore } from './orderStore';
+import { useNotificationStore } from './notificationStore';
 import i18n from '@/plugins/i18n';
 
 export interface NotificationItem {
@@ -39,6 +40,12 @@ export const useSignalRStore = defineStore('signalr', {
 
       signalRService.onOrderPlaced((orderId, customerName, total) => {
         this.addNotification('success', i18n.global.t('signalr.orderPlaced', { orderId, customerName, total: total.toFixed(2) }));
+      });
+
+      signalRService.onNotification((notif, unreadCount) => {
+        const notificationStore = useNotificationStore();
+        notificationStore.addNotification(notif, unreadCount);
+        this.addNotification('info', `📢 ${notif.title || 'Nowe powiadomienie'}: ${notif.message || ''}`);
       });
 
       this.connected = true;

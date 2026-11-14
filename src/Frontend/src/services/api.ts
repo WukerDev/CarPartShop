@@ -1,4 +1,4 @@
-import type { Category, CarPart, Order, ReturnRequestPayload, PaymentPayload, ProductReview, CouponValidationResult, InvoiceData } from '@/types';
+import type { Category, CarPart, Order, ReturnRequestPayload, PaymentPayload, ProductReview, CouponValidationResult, InvoiceData, CreatePartPayload, UpdatePartPayload, AppNotification, NotificationsResponse } from '@/types';
 import i18n from '@/plugins/i18n';
 
 class ApiService {
@@ -215,6 +215,99 @@ class ApiService {
       headers: this.getHeaders()
     });
     if (!res.ok) throw new Error(i18n.global.t('errors.invoiceFetchError'));
+    return await res.json();
+  }
+
+  async updateOrderStatus(
+    orderId: number,
+    status: string,
+    trackingNumber?: string,
+    courierName?: string
+  ): Promise<Order> {
+    const res = await fetch(`${this.getBaseUrl()}/api/orders/${orderId}/status`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ status, trackingNumber, courierName })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: 'Błąd zmiany statusu zamówienia' }));
+      throw new Error(err.message || 'Błąd zmiany statusu zamówienia');
+    }
+    return await res.json();
+  }
+
+  async createPart(payload: CreatePartPayload): Promise<CarPart> {
+    const res = await fetch(`${this.getBaseUrl()}/api/catalog/parts`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: 'Błąd tworzenia części' }));
+      throw new Error(err.message || 'Błąd tworzenia części');
+    }
+    return await res.json();
+  }
+
+  async updatePart(id: number, payload: UpdatePartPayload): Promise<CarPart> {
+    const res = await fetch(`${this.getBaseUrl()}/api/catalog/parts/${id}`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: 'Błąd aktualizacji części' }));
+      throw new Error(err.message || 'Błąd aktualizacji części');
+    }
+    return await res.json();
+  }
+
+  async deletePart(id: number): Promise<{ success: boolean; message: string }> {
+    const res = await fetch(`${this.getBaseUrl()}/api/catalog/parts/${id}`, {
+      method: 'DELETE',
+      headers: this.getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: 'Błąd usuwania części' }));
+      throw new Error(err.message || 'Błąd usuwania części');
+    }
+    return await res.json();
+  }
+
+  async getNotifications(unreadOnly = false): Promise<NotificationsResponse> {
+    const query = unreadOnly ? '?unreadOnly=true' : '';
+    const res = await fetch(`${this.getBaseUrl()}/api/notifications${query}`, {
+      headers: this.getHeaders()
+    });
+    if (!res.ok) throw new Error('Błąd ładowania powiadomień');
+    return await res.json();
+  }
+
+  async markNotificationAsRead(id: number): Promise<{ success: boolean; unreadCount: number }> {
+    const res = await fetch(`${this.getBaseUrl()}/api/notifications/${id}/read`, {
+      method: 'PUT',
+      headers: this.getHeaders()
+    });
+    if (!res.ok) throw new Error('Błąd oznaczania powiadomienia');
+    return await res.json();
+  }
+
+  async markAllNotificationsAsRead(): Promise<{ success: boolean; updatedCount: number; unreadCount: number }> {
+    const res = await fetch(`${this.getBaseUrl()}/api/notifications/read-all`, {
+      method: 'PUT',
+      headers: this.getHeaders()
+    });
+    if (!res.ok) throw new Error('Błąd oznaczania powiadomień');
+    return await res.json();
+  }
+
+  async createNotification(payload: { title: string; message: string; type?: string; link?: string }): Promise<AppNotification> {
+    const res = await fetch(`${this.getBaseUrl()}/api/notifications`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Błąd tworzenia powiadomienia');
     return await res.json();
   }
 }

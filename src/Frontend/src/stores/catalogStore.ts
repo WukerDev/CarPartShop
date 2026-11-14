@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from '@/services/api';
-import type { Category, CarPart } from '@/types';
+import type { Category, CarPart, CreatePartPayload, UpdatePartPayload } from '@/types';
 import i18n from '@/plugins/i18n';
 
 export const useCatalogStore = defineStore('catalog', {
@@ -200,6 +200,43 @@ export const useCatalogStore = defineStore('catalog', {
       const part = this.parts.find(p => p.id === partId);
       if (part) {
         part.stockQuantity = newStock;
+      }
+    },
+
+    async createPart(payload: CreatePartPayload) {
+      this.loading = true;
+      try {
+        const newPart = await api.createPart(payload);
+        this.parts.unshift(newPart);
+        this.totalCount++;
+        return newPart;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updatePart(id: number, payload: UpdatePartPayload) {
+      this.loading = true;
+      try {
+        const updated = await api.updatePart(id, payload);
+        const idx = this.parts.findIndex(p => p.id === id);
+        if (idx !== -1) {
+          this.parts[idx] = updated;
+        }
+        return updated;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async deletePart(id: number) {
+      this.loading = true;
+      try {
+        await api.deletePart(id);
+        this.parts = this.parts.filter(p => p.id !== id);
+        this.totalCount = Math.max(0, this.totalCount - 1);
+      } finally {
+        this.loading = false;
       }
     }
   }

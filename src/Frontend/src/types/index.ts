@@ -168,3 +168,43 @@ export interface User {
   roles: string[];
   token: string | null;
 }
+
+export interface CreatePartPayload {
+  name: string;
+  partNumber: string;
+  categoryId: number;
+  manufacturer: string;
+  price: number;
+  stockQuantity: number;
+  description: string;
+  compatibility: string;
+  imageUrl?: string;
+}
+
+export interface UpdatePartPayload {
+  name?: string;
+  partNumber?: string;
+  categoryId?: number;
+  manufacturer?: string;
+  price?: number;
+  stockQuantity?: number;
+  description?: string;
+  compatibility?: string;
+  imageUrl?: string;
+}
+
+export interface AppNotification {
+  id: number;
+  title: string;
+  message: string;
+  type: string;
+  isRead: boolean;
+  createdAt: string;
+  link?: string;
+}
+
+export interface NotificationsResponse {
+  unreadCount: number;
+  totalCount: number;
+  notifications: AppNotification[];
+}
