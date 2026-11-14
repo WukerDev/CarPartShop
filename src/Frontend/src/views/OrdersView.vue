@@ -144,6 +144,19 @@
             </v-btn>
 
             <v-btn
+              v-if="authStore.isAdmin"
+              variant="tonal"
+              color="secondary"
+              size="small"
+              prepend-icon="mdi-pencil-box-outline"
+              class="text-none font-weight-bold"
+              rounded="lg"
+              @click="openStatusDialog(order)"
+            >
+              {{ $t('orders.manageStatus') }}
+            </v-btn>
+
+            <v-btn
               v-if="order.status !== 'Returned' && order.returnStatus !== 'Approved'"
               variant="tonal"
               color="warning"
@@ -373,6 +386,76 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="statusDialogOpen" max-width="500">
+      <v-card color="surface" class="rounded-xl pa-3" border>
+        <v-card-title class="d-flex align-center justify-space-between pt-2 px-3">
+          <div class="d-flex align-center">
+            <v-icon icon="mdi-order-bool-ascending-variant" color="secondary" class="mr-2"></v-icon>
+            <span class="text-subtitle-1 font-weight-bold text-white">
+              {{ $t('orders.statusDialogTitle', { id: selectedOrderForStatus?.id }) }}
+            </span>
+          </div>
+          <v-btn icon="mdi-close" variant="text" size="small" @click="statusDialogOpen = false"></v-btn>
+        </v-card-title>
+
+        <v-card-text class="px-3">
+          <p class="text-caption text-grey mb-4">
+            {{ $t('orders.statusDialogDesc') }}
+          </p>
+
+          <v-select
+            v-model="newOrderStatus"
+            :label="$t('orders.statusLabel')"
+            :items="availableStatuses"
+            item-title="title"
+            item-value="value"
+            variant="outlined"
+            density="compact"
+            class="mb-3"
+          ></v-select>
+
+          <v-text-field
+            v-model="newCourierName"
+            :label="$t('orders.courierLabel')"
+            placeholder="np. InPost Paczkomaty 24/7, DPD"
+            variant="outlined"
+            density="compact"
+            class="mb-3"
+          ></v-text-field>
+
+          <v-text-field
+            v-model="newTrackingNumber"
+            :label="$t('orders.trackingLabel')"
+            placeholder="np. 624589214785412"
+            variant="outlined"
+            density="compact"
+          ></v-text-field>
+        </v-card-text>
+
+        <v-card-actions class="px-3 pb-3">
+          <v-spacer></v-spacer>
+          <v-btn
+            variant="text"
+            color="grey"
+            class="text-none"
+            @click="statusDialogOpen = false"
+          >
+            {{ $t('orders.cancel') }}
+          </v-btn>
+          <v-btn
+            color="secondary"
+            variant="flat"
+            class="text-none font-weight-bold"
+            rounded="lg"
+            :loading="orderStore.loading"
+            @click="saveOrderStatus"
+          >
+            {{ $t('orders.saveStatus') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -398,6 +481,20 @@ const returnComments = ref('');
 const invoiceDialogOpen = ref(false);
 const loadingInvoice = ref(false);
 const currentInvoice = ref<InvoiceData | null>(null);
+
+const statusDialogOpen = ref(false);
+const selectedOrderForStatus = ref<Order | null>(null);
+const newOrderStatus = ref('Processing');
+const newCourierName = ref('');
+const newTrackingNumber = ref('');
+
+const availableStatuses = computed(() => [
+  { value: 'Paid', title: t('orders.status.paid') },
+  { value: 'Processing', title: t('orders.status.processing') },
+  { value: 'Shipped', title: t('orders.status.shipped') },
+  { value: 'Delivered', title: t('orders.status.delivered') },
+  { value: 'Cancelled', title: t('orders.status.cancelled') }
+]);
 
 const returnReasonOptions = computed(() => [
   t('orders.reasons.wrongPart'),
@@ -486,6 +583,31 @@ async function submitReturn() {
     await loadOrders();
   } catch (err: any) {
     signalrStore.addNotification('error', err.message || t('notifications.returnError'));
+  }
+}
+
+function openStatusDialog(order: Order) {
+  selectedOrderForStatus.value = order;
+  newOrderStatus.value = order.status;
+  newCourierName.value = order.courierName || 'InPost Paczkomaty 24/7';
+  newTrackingNumber.value = order.trackingNumber || '';
+  statusDialogOpen.value = true;
+}
+
+async function saveOrderStatus() {
+  if (!selectedOrderForStatus.value) return;
+  try {
+    await orderStore.changeOrderStatus(
+      selectedOrderForStatus.value.id,
+      newOrderStatus.value,
+      newTrackingNumber.value || undefined,
+      newCourierName.value || undefined
+    );
+    signalrStore.addNotification('success', t('notifications.statusUpdatedSuccess'));
+    statusDialogOpen.value = false;
+    await loadOrders();
+  } catch (err: any) {
+    signalrStore.addNotification('error', err.message || t('notifications.statusUpdatedError'));
   }
 }
 </script>
