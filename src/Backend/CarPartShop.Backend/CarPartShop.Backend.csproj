@@ -13,6 +13,8 @@
     <PackageReference Include="Grpc.AspNetCore.Web" Version="2.84.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
   </ItemGroup>
 
@@ -20,6 +22,7 @@
     <Protobuf Include="Protos\catalog.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\order.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\payment.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\notification.proto" GrpcServices="Server" />
   </ItemGroup>
 
 </Project>
